@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="44fc37bf-b436-40f1-a1e1-c840b8fff2be" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Mono Cecil/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Mono Cecil/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Mono Cecil/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Mono Cecil/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Mono Cecil/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Mono Cecil/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Mono Cecil Intro/Script/CecilTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mono Cecil Intro/Script/CecilTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,6 +19,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Mono Cecil Intro/Script/CecilTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/_Script/Foo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/B6D68F36-8D66-45AF-BF0E-07217963C67F/30/b4f233a3/Attribute.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Mono Cecil Intro/Script/CecilUtility.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/B6D68F36-8D66-45AF-BF0E-07217963C67F/b9/4fa4d7a2/SerializableAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.rider@1.1.0/Rider/Editor/EditorPluginInterop.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Mono Cecil Intro/Script/ProfileAttribute.cs" root0="FORCE_HIGHLIGHTING" />
@@ -33,6 +33,7 @@
         <option value="$PROJECT_DIR$/Assets/Mono Cecil Intro/Editor/CecilTest.cs" />
         <option value="$PROJECT_DIR$/Assets/Mono Cecil Intro/Script/ProfileAttribute.cs" />
         <option value="$PROJECT_DIR$/Assets/Mono Cecil Intro/Script/CecilTest.cs" />
+        <option value="$PROJECT_DIR$/Assets/Mono Cecil Intro/Script/CecilUtility.cs" />
       </list>
     </option>
   </component>

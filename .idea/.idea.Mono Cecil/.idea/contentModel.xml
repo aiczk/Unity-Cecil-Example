@@ -13,6 +13,7 @@
           <e p="MCI.asmdef" t="Include" />
           <e p="Script" t="Include">
             <e p="CecilTest.cs" t="Include" />
+            <e p="CecilUtility.cs" t="Include" />
             <e p="ProfileAttribute.cs" t="Include" />
           </e>
         </e>

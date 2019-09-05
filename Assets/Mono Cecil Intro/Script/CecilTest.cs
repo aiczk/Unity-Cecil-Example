@@ -72,7 +72,6 @@ namespace Mono_Cecil_Intro.Script
                 }
             }
             
-            //IO Exception
             mainModuleDefinition.Write(mainAssembly.Location);
             
             bool ProfileMethodCheck(TypeDefinition typeDefinition)
