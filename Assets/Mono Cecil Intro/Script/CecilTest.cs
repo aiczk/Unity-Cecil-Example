@@ -19,7 +19,7 @@ namespace Mono_Cecil_Intro.Script
             if(EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            PostCompile();
+            //PostCompile();
         }
 
         private static void PostCompile()

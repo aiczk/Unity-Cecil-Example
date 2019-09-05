@@ -8,12 +8,15 @@
       <e p="Assets" t="Include">
         <e p="_Script" t="Include">
           <e p="Foo.cs" t="Include" />
+          <e p="Generate.cs" t="Include" />
         </e>
         <e p="Mono Cecil Intro" t="Include">
           <e p="MCI.asmdef" t="Include" />
           <e p="Script" t="Include">
             <e p="CecilTest.cs" t="Include" />
             <e p="CecilUtility.cs" t="Include" />
+            <e p="GenerateAttribute.cs" t="Include" />
+            <e p="GenerateTest.cs" t="Include" />
             <e p="ProfileAttribute.cs" t="Include" />
           </e>
         </e>

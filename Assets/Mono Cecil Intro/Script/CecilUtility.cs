@@ -43,5 +43,17 @@ namespace Mono.Cecil.Utils
                 break;
             }
         }
+        
+        public static void RemoveAttribute(TypeDefinition targetDefinition, string attributeFullName)
+        {
+            foreach (var customAttribute in targetDefinition.CustomAttributes)
+            {
+                if(customAttribute.AttributeType.FullName != attributeFullName)
+                    continue;
+                    
+                targetDefinition.CustomAttributes.Remove(customAttribute);
+                break;
+            }
+        }
     }
 }
