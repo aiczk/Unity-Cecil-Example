@@ -46,7 +46,13 @@ namespace Mono_Cecil_Intro.Script
 
         private static void Process(Assembly mainAssembly,Assembly editorAssembly)
         {
-            var mainAssemblyDefinition = AssemblyDefinition.ReadAssembly(mainAssembly.Location, new ReaderParameters{ReadWrite = true});
+            var readerParameters = new ReaderParameters
+            {
+                ReadWrite = true,
+                InMemory = true,
+                ReadingMode = ReadingMode.Immediate
+            };
+            var mainAssemblyDefinition = AssemblyDefinition.ReadAssembly(mainAssembly.Location, readerParameters);
             var mainModuleDefinition = mainAssemblyDefinition.MainModule;
 
             var editorAssemblyDefinition = AssemblyDefinition.ReadAssembly(editorAssembly.Location);
