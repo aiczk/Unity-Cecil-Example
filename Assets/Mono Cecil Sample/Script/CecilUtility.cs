@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
 
-namespace Mono.Cecil.Utils
+namespace Mono_Cecil_Sample.Script
 {
     public static class CecilUtility
     {

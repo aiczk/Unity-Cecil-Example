@@ -2,12 +2,10 @@
 using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Utils;
 using UnityEditor;
-using UnityEngine;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 
-namespace Mono_Cecil_Intro.Script
+namespace Mono_Cecil_Sample.Script
 {
     [InitializeOnLoad]
     public static class GenerateTest
@@ -17,7 +15,7 @@ namespace Mono_Cecil_Intro.Script
             if(EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            PostCompile();
+            //PostCompile();
         }
 
         private static void PostCompile()
@@ -60,7 +58,7 @@ namespace Mono_Cecil_Intro.Script
 
             var engineModuleDefinition = engineAssemblyDefinition.MainModule;
 
-            var generateAttributeTypeDefinition = editorModuleDefinition.GetType("Mono_Cecil_Intro.Script", "GenerateAttribute");
+            var generateAttributeTypeDefinition = editorModuleDefinition.GetType("Mono_Cecil_Sample.Attributes", "GenerateAttribute");
             var generateAttributeFullName = generateAttributeTypeDefinition.FullName;
             
             var typeDefinitions = mainModuleDefinition

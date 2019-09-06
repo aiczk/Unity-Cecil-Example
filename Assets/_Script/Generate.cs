@@ -1,4 +1,4 @@
-﻿using Mono_Cecil_Intro.Script;
+﻿using Mono_Cecil_Sample.Attributes;
 using UnityEngine;
 
 namespace _Script

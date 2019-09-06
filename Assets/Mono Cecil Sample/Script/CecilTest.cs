@@ -4,12 +4,11 @@ using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.Profiling;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
 // ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
 
-namespace Mono_Cecil_Intro.Script
+namespace Mono_Cecil_Sample.Script
 {
     [InitializeOnLoad]
     public static class CecilTest
@@ -57,7 +56,7 @@ namespace Mono_Cecil_Intro.Script
 
             var editorAssemblyDefinition = AssemblyDefinition.ReadAssembly(editorAssembly.Location);
             var editorModuleDefinition = editorAssemblyDefinition.MainModule;
-            var profileAttributeTypeDefinition = editorModuleDefinition.GetType("Mono_Cecil_Intro.Script", "ProfileAttribute");
+            var profileAttributeTypeDefinition = editorModuleDefinition.GetType("Mono_Cecil_Sample.Attributes", "ProfileAttribute");
             
             //注入対象の型の列挙
             foreach (var classTypeDefinition in mainModuleDefinition.Types.Where(ProfileMethodCheck).ToArray())
@@ -96,7 +95,7 @@ namespace Mono_Cecil_Intro.Script
             {
                 foreach (var customAttribute in methodDefinition.CustomAttributes)
                 {
-                    if(customAttribute.AttributeType.FullName != "Mono_Cecil_Intro.Script.ProfileAttribute")
+                    if(customAttribute.AttributeType.FullName != "Mono_Cecil_Sample.Attributes")
                         continue;
                     
                     methodDefinition.CustomAttributes.Remove(customAttribute);

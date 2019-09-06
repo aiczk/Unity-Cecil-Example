@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mono_Cecil_Intro.Script
+namespace Mono_Cecil_Sample.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class ProfileAttribute : Attribute
