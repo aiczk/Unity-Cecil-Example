@@ -2,11 +2,20 @@
 using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
+// ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
 
 namespace Mono_Cecil_Sample.Script
 {
     public static class CecilUtility
     {
+        public static ReaderParameters ReadAndWrite => 
+            new ReaderParameters
+        {
+            ReadWrite = true,
+            InMemory = true,
+            ReadingMode = ReadingMode.Immediate
+        };
+        
         public static Assembly GetAssembly(string assemblyName)
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -14,6 +23,12 @@ namespace Mono_Cecil_Sample.Script
             return assembly;
         }
         
+        public static AssemblyDefinition ToAssemblyDefinition(this Assembly assembly) => 
+            AssemblyDefinition.ReadAssembly(assembly.Location);
+
+        public static AssemblyDefinition ToAssemblyDefinition(this Assembly assembly,ReaderParameters parameters) => 
+            AssemblyDefinition.ReadAssembly(assembly.Location, parameters);
+
         public static bool IsExistAttributesInClass(TypeDefinition classDefinition, string attributeFullName)
         {
             if (classDefinition.Name == "<Module>")
@@ -25,13 +40,16 @@ namespace Mono_Cecil_Sample.Script
                    .Any(x => x.AttributeType.FullName == attributeFullName);
         }
         
-        public static bool IsAttachedAttribute(MethodDefinition methodDefinition, string attributeFullName)
+        public static bool IsAttachedMethodAttribute(MethodDefinition methodDefinition, string attributeFullName)
         {
             return methodDefinition
                    .CustomAttributes
                    .Any(x => x.AttributeType.FullName == attributeFullName);
         }
         
+        public static bool IsExistAttributeInGlobal(TypeDefinition typeDefinition,string attributeFullName) => 
+            typeDefinition.CustomAttributes.Any(x => x.AttributeType.FullName == attributeFullName);
+
         public static void RemoveAttribute(MethodDefinition targetMethod, string attributeFullName)
         {
             foreach (var customAttribute in targetMethod.CustomAttributes)

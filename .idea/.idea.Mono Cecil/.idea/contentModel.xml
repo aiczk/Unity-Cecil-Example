@@ -7,6 +7,7 @@
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
         <e p="_Script" t="Include">
+          <e p="Baa.cs" t="Include" />
           <e p="Foo.cs" t="Include" />
           <e p="Generate.cs" t="Include" />
         </e>
@@ -21,6 +22,7 @@
             <e p="CecilTest.cs" t="Include" />
             <e p="CecilUtility.cs" t="Include" />
             <e p="GenerateTest.cs" t="Include" />
+            <e p="ModTest.cs" t="Include" />
           </e>
         </e>
       </e>
