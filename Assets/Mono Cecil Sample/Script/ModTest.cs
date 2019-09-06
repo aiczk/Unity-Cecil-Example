@@ -29,8 +29,9 @@ namespace Mono_Cecil_Sample.Script
                 var engineAssembly = EngineAssemblyDefinition();
                 var modAssembly = CreateAssembly();
 
+                //
                 Process(mainAssembly, editorAssembly, engineAssembly, modAssembly);
-                //modAssembly.Write("Mod.dll");
+                modAssembly.Write("Mod.dll");
             }
             finally
             {
@@ -55,6 +56,7 @@ namespace Mono_Cecil_Sample.Script
             var mainModuleDefinition = mainAssemblyDefinition.MainModule;
             var editorModuleDefinition = editorAssemblyDefinition.MainModule;
             var engineModuleDefinition = engineAssemblyDefinition.MainModule;
+            var modModuleDefinition = modAssemblyDefinition.MainModule;
 
             var modAttributeTypeDefinition = editorModuleDefinition.GetType("Mono_Cecil_Sample.Attributes", "ModAttribute");
             var modAttributeFullName = modAttributeTypeDefinition.FullName;
@@ -63,21 +65,11 @@ namespace Mono_Cecil_Sample.Script
                               .Types
                               .Where(x => CecilUtility.IsExistAttributeInGlobal(x, modAttributeFullName))
                               .ToArray();
-
-            var classes = new List<TypeDefinition>();
-            var enums = new List<TypeDefinition>();
-            var interfaces = new List<TypeDefinition>();
-
-            Definitions(in definitions, ref classes, ref enums, ref interfaces);
+            
+            Definitions(in definitions, modModuleDefinition);
         }
 
-        private static void Definitions
-        (
-            in TypeDefinition[] definitions,
-            ref List<TypeDefinition> classes,
-            ref List<TypeDefinition> enums,
-            ref List<TypeDefinition> interfaces
-        )
+        private static void Definitions(in TypeDefinition[] definitions,ModuleDefinition mod)
         {
             foreach (var definition in definitions)
             {
@@ -85,19 +77,17 @@ namespace Mono_Cecil_Sample.Script
                 {
                     Debug.Log($"interface {definition.Name}");
                     
-                    interfaces.Add(definition);
                     continue;
                 }
 
                 if (definition.IsEnum)
                 {
                     Debug.Log($"enum {definition.Name}");
-                    enums.Add(definition);
+                    
                     continue;
                 }
 
                 Debug.Log($"class {definition.Name}");
-                classes.Add(definition);
             }
         }
 
