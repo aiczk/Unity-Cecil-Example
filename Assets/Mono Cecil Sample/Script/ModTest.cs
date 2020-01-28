@@ -11,12 +11,14 @@ namespace Mono_Cecil_Sample.Script
     [InitializeOnLoad]
     public static class ModTest
     {
+        private static string NameSpace => $"{Application.productName.Replace(" ","_")}.Mod";
+        
         static ModTest()
         {
             if(EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            PostCompile();
+            //PostCompile();
         }
 
         private static void PostCompile()
@@ -26,22 +28,14 @@ namespace Mono_Cecil_Sample.Script
             {
                 var mainAssembly = CecilUtility.GetAssembly("Assembly-CSharp").ToAssemblyDefinition();
                 var editorAssembly = CecilUtility.GetAssembly("MCI").ToAssemblyDefinition();
-                var engineAssembly = EngineAssemblyDefinition();
+                var engineAssembly = CecilUtility.EngineAssemblyDefinition();
                 var modAssembly = CreateAssembly();
-
-                //
+                
                 Process(mainAssembly, editorAssembly, engineAssembly, modAssembly);
-                modAssembly.Write("Mod.dll");
             }
             finally
             {
                 EditorApplication.UnlockReloadAssemblies();
-            }
-
-            AssemblyDefinition EngineAssemblyDefinition()
-            {
-                const string path = "C:\\Program Files\\Unity\\Editor\\Data\\Managed\\UnityEngine.dll";
-                return AssemblyDefinition.ReadAssembly(path);
             }
         }
 
@@ -66,28 +60,39 @@ namespace Mono_Cecil_Sample.Script
                               .Where(x => CecilUtility.IsExistAttributeInGlobal(x, modAttributeFullName))
                               .ToArray();
             
-            Definitions(in definitions, modModuleDefinition);
+            TryInjectTypes(in definitions, modModuleDefinition);
+            //modModuleDefinition.Write("Mod.dll");
         }
 
-        private static void Definitions(in TypeDefinition[] definitions,ModuleDefinition mod)
+        private static void TryInjectTypes(in TypeDefinition[] globalModTargets,ModuleDefinition mod)
         {
-            foreach (var definition in definitions)
+            //todo 不完全なので改善する。
+            foreach (var target in globalModTargets)
             {
-                if (definition.IsInterface)
+                if (target.IsInterface)
                 {
-                    Debug.Log($"interface {definition.Name}");
-                    
-                    continue;
+                    //Debug.Log($"interface {target.Name}");
                 }
 
-                if (definition.IsEnum)
+                if (target.IsEnum)
                 {
-                    Debug.Log($"enum {definition.Name}");
-                    
-                    continue;
+                    //Debug.Log($"enum {target.Name}");
                 }
 
-                Debug.Log($"class {definition.Name}");
+                //Debug.Log($"class {target.Name}");
+
+                var methods = target.Methods;
+
+                foreach (var name in methods.Select(x => x.Name))
+                {
+                    foreach (var instruction in methods.SelectMany(methodDefinition => methodDefinition.Body.Instructions))
+                    {
+                        Debug.Log($"Type:{target.Name} Method:{name} IL:{instruction}");
+                    }
+                }
+                
+                //var typeDefinition = new TypeDefinition(NameSpace, target.Name, target.Attributes);
+                //mod.Types.Add(typeDefinition);
             }
         }
 

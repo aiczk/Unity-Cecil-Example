@@ -8,6 +8,8 @@ namespace Mono_Cecil_Sample.Script
 {
     public static class CecilUtility
     {
+        private const string Path = "C:\\Program Files\\Unity\\Hub\\Editor\\2019.1.14f1\\Editor\\Data\\Managed\\UnityEngine.dll";
+        
         public static ReaderParameters ReadAndWrite => 
             new ReaderParameters
         {
@@ -23,6 +25,8 @@ namespace Mono_Cecil_Sample.Script
             return assembly;
         }
         
+        public static AssemblyDefinition EngineAssemblyDefinition() => AssemblyDefinition.ReadAssembly(Path);
+
         public static AssemblyDefinition ToAssemblyDefinition(this Assembly assembly) => 
             AssemblyDefinition.ReadAssembly(assembly.Location);
 

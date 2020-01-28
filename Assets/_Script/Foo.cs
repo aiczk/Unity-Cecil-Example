@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace _Script
 {
-    public class Foo : MonoBehaviour
+    public class Foo : SingletonMonoBehaviour<Foo>
     {
+        public string fooString = "FOOO";
         private void Awake()
         {
             

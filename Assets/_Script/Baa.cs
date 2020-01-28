@@ -3,12 +3,14 @@ using UnityEngine;
 
 namespace _Script
 {
-    [Mod]
     public class Baa : MonoBehaviour
     {
+        [Inject]
+        private Foo foo = default;
+        
         void Start()
         {
-        
+            Debug.Log(foo.fooString);
         }
 
         void Update()
@@ -22,14 +24,19 @@ namespace _Script
     {
         public static void Log()
         {
-            
+            Debug.Log("Log");
         }
     }
 
     [Mod]
     public struct BaaStruct
     {
-        public int Length { get; set; }
+        public int Length;
+
+        public bool IsOpen()
+        {
+            return true;
+        }
     }
 
     [Mod]

@@ -6,6 +6,8 @@ using Mono.Cecil.Cil;
 using UnityEditor;
 using UnityEngine.Profiling;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
+using MethodAttributes = Mono.Cecil.MethodAttributes;
+
 // ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
 
 namespace Mono_Cecil_Sample.Script
@@ -43,7 +45,7 @@ namespace Mono_Cecil_Sample.Script
             return assembly;
         }
 
-        private static void Process(Assembly mainAssembly,Assembly editorAssembly)
+        private static void Process(Assembly mainAssembly, Assembly editorAssembly)
         {
             var readerParameters = new ReaderParameters
             {
@@ -111,7 +113,11 @@ namespace Mono_Cecil_Sample.Script
 
             var awakeMethodDefinition = classDefinition.Methods.FirstOrDefault(x => x.Name == "Awake");
             if (awakeMethodDefinition == null)
-                return false;
+            {
+                var awakeTypeReference = mainModule.TypeSystem.Void;
+                awakeMethodDefinition = new MethodDefinition("Awake", MethodAttributes.Private, awakeTypeReference);
+                classDefinition.Methods.Add(awakeMethodDefinition);
+            }
 
             var fieldName = "_sampler";
             var samplerName = "Custom Sampler";
