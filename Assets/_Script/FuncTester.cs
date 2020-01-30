@@ -14,41 +14,20 @@ namespace _Script
  
          private void Foo()
          {
-             var enume = new[]
-             {
-                 new Tester("ABC",100,321), 
-                 new Tester("CUDA",100,321), 
-                 new Tester("asdf",100,321), 
-                 new Tester("Aghs",100,321), 
-             };
-
-             var s = enume.Where(x => x.Id == "ABC").Select(x => x.Damage++);
+             var enume = new[] { 1,2,4,5,6,7,76,2342};
          }
 
          private void Hoo()
          {
              var su = 0;
+             var sua = 0;
+             var sus = 0;
+             var suf = 0;
 
              for (var i = 0; i < 10; i++)
              {
                  su += i;
              }
          }
-     }
-
-     public class Tester : IEquatable<Tester>
-     {
-         public float Hp;
-         public int Damage;
-         public string Id;
-
-         public Tester(string id, int damage, float hp)
-         {
-             Id = id;
-             Damage = damage;
-             Hp = hp;
-         }
-
-         public bool Equals(Tester other) => other != null && other.Id == Id;
      }
  }

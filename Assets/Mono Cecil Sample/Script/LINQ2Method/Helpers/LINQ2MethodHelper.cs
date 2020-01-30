@@ -1,4 +1,6 @@
-﻿using Mono.Cecil.Cil;
+﻿using System;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -6,27 +8,56 @@ namespace LINQ2Method.Helpers
 {
     public static class Linq2MethodHelper
     {
-        public static Instruction ForOpCode(sbyte loopCount)
+        public static Instruction LdcI4(sbyte loopCount)
         {
-            var opCode = LoadLength(loopCount);
-            return opCode.Equals(OpCodes.Ldc_I4_S) ? Instruction.Create(opCode, loopCount) : Instruction.Create(opCode);
+            var ldcI4 = OpCodeHelper.LdcI4(loopCount);
+            return ldcI4.Equals(OpCodes.Ldc_I4_S) ? Instruction.Create(ldcI4, loopCount) : Instruction.Create(ldcI4);
         }
 
-        public static OpCode LoadLength(sbyte length)
+        public static (Instruction stLoc, Instruction ldLoc) LocalInstructions(int index)
         {
-            return length switch
+            var ldLoc = LdLoc(index);
+            var stLoc = StLoc(index);
+            return (stLoc, ldLoc);
+        }
+        
+        public static Instruction LdLoc(int index)
+        {
+            var ldLoc = OpCodeHelper.LdLoc(index);
+            return ldLoc.Equals(OpCodes.Ldloc_S) ? Instruction.Create(ldLoc, index) : Instruction.Create(ldLoc);
+        }
+
+        public static Instruction StLoc(int index)
+        {
+            var stLoc = OpCodeHelper.StLoc(index);
+            return stLoc.Equals(OpCodes.Stloc_S) ? Instruction.Create(stLoc, index) : Instruction.Create(stLoc);
+        }
+        
+        public static void AddVariables(this MethodBody methodBody, params TypeReference[] references)
+        {
+            var variables = methodBody.Variables;
+            foreach (var reference in references)
             {
-                0 => OpCodes.Ldc_I4_0,
-                1 => OpCodes.Ldc_I4_1,
-                2 => OpCodes.Ldc_I4_2,
-                3 => OpCodes.Ldc_I4_3,
-                4 => OpCodes.Ldc_I4_4,
-                5 => OpCodes.Ldc_I4_5,
-                6 => OpCodes.Ldc_I4_6,
-                7 => OpCodes.Ldc_I4_7,
-                8 => OpCodes.Ldc_I4_8,
-                _ => OpCodes.Ldc_I4_S
-            };
+                variables.Add(new VariableDefinition(reference));
+            }
+        }
+        
+        public static T Operand<T>(Instruction instruction)
+        where T : struct
+        {
+            T result;
+
+            try
+            {
+                result = (T) instruction.Operand;
+            }
+            catch (InvalidCastException e)
+            {
+                Debug.LogError("Cast Error.");
+                throw;
+            }
+
+            return result;
         }
     }
 }

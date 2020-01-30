@@ -10,29 +10,31 @@ namespace LINQ2Method.Basics
         private TypeSystem typeSystem;
         private Instruction loopStart;
         private Instruction loopCheck;
+        private int variablesCount;
 
         public For(TypeSystem typeSystem)
         {
             this.typeSystem = typeSystem;
             
             loopStart = Instruction.Create(OpCodes.Nop);
-            loopCheck = Instruction.Create(OpCodes.Ldloc_0);
         }
 
-        public void Start(MethodBody methodBody)
+        public void Start(MethodBody methodBody, sbyte initValue = 0)
         {
-            methodBody.Variables.Add(new VariableDefinition(typeSystem.Int32));
-            methodBody.Variables.Add(new VariableDefinition(typeSystem.Boolean));
-
+            variablesCount = methodBody.Variables.Count;
+            loopCheck = Linq2MethodHelper.LdLoc(variablesCount);
+            
+            methodBody.AddVariables(typeSystem.Int32, typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
 
-            //i = 0
-            processor.Emit(OpCodes.Ldc_I4_0);
-            processor.Emit(OpCodes.Stloc_0);
+            //i = n
+            processor.Append(Linq2MethodHelper.LdcI4(initValue));
+            processor.Append(Linq2MethodHelper.StLoc(variablesCount));
             
-            //i < nが条件を満たしているかチェックするためにi < nへジャンプする
+            //i < n check
             processor.Emit(OpCodes.Br_S, loopCheck);
             
+            //loop start
             processor.Append(loopStart);
         }
 
@@ -40,22 +42,23 @@ namespace LINQ2Method.Basics
         {
             var processor = methodBody.GetILProcessor();
             
+            //loop end
             processor.Emit(OpCodes.Nop);
 
             //i++
-            processor.Emit(OpCodes.Ldloc_0);
+            processor.Append(Linq2MethodHelper.LdLoc(variablesCount));
             processor.Emit(OpCodes.Ldc_I4_1);
             processor.Emit(OpCodes.Add);
-            processor.Emit(OpCodes.Stloc_0);
+            processor.Append(Linq2MethodHelper.StLoc(variablesCount));
 
             //i < n
             processor.Append(loopCheck);
-            processor.Append(Linq2MethodHelper.ForOpCode(loopCount));
+            processor.Append(Linq2MethodHelper.LdcI4(loopCount));
             processor.Emit(OpCodes.Clt);
-            processor.Emit(OpCodes.Stloc_1);
+            processor.Append(Linq2MethodHelper.StLoc(variablesCount + 1));
             
             //trueならばloopを最初のnop命令に戻す
-            processor.Emit(OpCodes.Ldloc_1);
+            processor.Append(Linq2MethodHelper.LdLoc(variablesCount + 1));
             processor.Emit(OpCodes.Brtrue_S, loopStart);
             
             processor.Emit(OpCodes.Ret);

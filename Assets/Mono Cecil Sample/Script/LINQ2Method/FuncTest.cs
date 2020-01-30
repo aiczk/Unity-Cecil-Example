@@ -1,8 +1,11 @@
-﻿using LINQ2Method.Basics;
+﻿using System.Linq;
+using LINQ2Method.Basics;
+using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono_Cecil_Sample.Script;
 using UnityEditor;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace LINQ2Method
@@ -15,7 +18,7 @@ namespace LINQ2Method
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            PostCompile();
+            //PostCompile();
         }
 
         private static void PostCompile()
@@ -58,13 +61,14 @@ namespace LINQ2Method
             mainTestClassDefinition.Methods.Add(methodDefinition);
 
             var forLoop = new For(mainAssemblyModule.TypeSystem);
-            
-            forLoop.Start(methodDefinition.Body);
-            forLoop.End(methodDefinition.Body, 5);
+            var methodBody = methodDefinition.Body;
+
+            forLoop.Start(methodBody);
+            forLoop.End(methodBody, 5);
 
             //ForLoop(mainAssemblyModule.TypeSystem, methodDefinition.Body, 10);
 
-            //mainAssemblyModule.Write("Test.dll");
+            mainAssemblyModule.Write("Test.dll");
         }
     }
 }
