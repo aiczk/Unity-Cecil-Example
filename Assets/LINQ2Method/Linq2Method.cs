@@ -1,24 +1,21 @@
-﻿using System.Linq;
+﻿using _Script;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Mono_Cecil_Sample.Script;
 using UnityEditor;
 using UnityEngine;
 
-// ReSharper disable once CheckNamespace
 namespace LINQ2Method
 {
     [InitializeOnLoad]
-    public static class FuncTest
+    public static class Linq2Method
     {
-        static FuncTest()
+        static Linq2Method()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            //PostCompile();
+            PostCompile();
         }
 
         private static void PostCompile()
@@ -26,8 +23,8 @@ namespace LINQ2Method
             EditorApplication.LockReloadAssemblies();
             try
             {
-                var readerParams = CecilUtility.ReadAndWrite;
-                var mainAssembly = CecilUtility.GetAssembly("Assembly-CSharp").ToAssemblyDefinition(readerParams);
+                var readerParams = AssemblyHelper.ReadAndWrite();
+                var mainAssembly = AssemblyHelper.GetAssembly("Main").ToAssemblyDefinition(readerParams);
                 Execute(mainAssembly);
             }
             finally
@@ -38,10 +35,10 @@ namespace LINQ2Method
 
         private static void Execute(AssemblyDefinition mainAssembly)
         {
-            var mainAssemblyModule = mainAssembly.MainModule;
+            var mainModule = mainAssembly.MainModule;
             
-            var mainTestClassDefinition = mainAssemblyModule.GetType("_Script", "FuncTester");
-            
+            var mainTestClassDefinition = mainModule.GetType("_Script", "FuncTester");
+
 /*          foreach (var nestedType in mainTestClassDefinition.NestedTypes)
             {
                 foreach (var method in nestedType.Methods)
@@ -57,18 +54,24 @@ namespace LINQ2Method
                 }
             }*/
 
-            var methodDefinition = new MethodDefinition("TestMethod", MethodAttributes.Private, mainAssemblyModule.TypeSystem.Void);
+            var typeSystem = mainModule.TypeSystem;
+            var methodDefinition = new MethodDefinition("TestMethod", MethodAttributes.Private, typeSystem.Void);
             mainTestClassDefinition.Methods.Add(methodDefinition);
-
-            var forLoop = new For(mainAssemblyModule.TypeSystem);
+            
+            var forLoop = new For(typeSystem);
+            var branch = new If(typeSystem);
             var methodBody = methodDefinition.Body;
 
             forLoop.Start(methodBody);
-            forLoop.End(methodBody, 5);
+            
+            var funcMethod = mainTestClassDefinition.NestedTypes[0].Methods[2].Body;
+            branch.Create(methodBody, funcMethod, forLoop, forLoop.LoopEnd);
 
-            //ForLoop(mainAssemblyModule.TypeSystem, methodDefinition.Body, 10);
-
-            mainAssemblyModule.Write("Test.dll");
+            forLoop.End(methodBody, 90);
+            
+            InstructionHelper.Return(methodBody);
+            
+            mainModule.Write("Test.dll");
         }
     }
 }

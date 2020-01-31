@@ -1,5 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-namespace LINQ2Method.Helpers
+﻿namespace LINQ2Method.Basics
 {
     public enum LinqOperators
     {

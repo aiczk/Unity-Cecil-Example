@@ -1,11 +1,10 @@
 ﻿using Mono.Cecil.Cil;
 
-// ReSharper disable once CheckNamespace
 namespace LINQ2Method.Helpers
 {
     public static class OpCodeHelper
     {
-        public static OpCode LdcI4(sbyte length)
+        public static OpCode LdcI4(int length)
         {
             return length switch
             {
@@ -18,7 +17,8 @@ namespace LINQ2Method.Helpers
                 6 => OpCodes.Ldc_I4_6,
                 7 => OpCodes.Ldc_I4_7,
                 8 => OpCodes.Ldc_I4_8,
-                _ => OpCodes.Ldc_I4_S
+                var lng when lng <= 127 && lng >= -128 => OpCodes.Ldc_I4_S,
+                _ => OpCodes.Ldc_I4,
             };
         }
         
