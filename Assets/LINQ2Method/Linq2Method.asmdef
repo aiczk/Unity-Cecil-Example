@@ -1,7 +1,8 @@
 {
     "name": "Linq2Method",
     "references": [
-        "GUID:3bc2b9e8633de7244a1436d2d79d7b39"
+        "GUID:3bc2b9e8633de7244a1436d2d79d7b39",
+        "GUID:cd3443cfdd271a14eb65ed2e3cc150e6"
     ],
     "includePlatforms": [
         "Android",

@@ -17,7 +17,7 @@ namespace LINQ2Method.Helpers
                 6 => OpCodes.Ldc_I4_6,
                 7 => OpCodes.Ldc_I4_7,
                 8 => OpCodes.Ldc_I4_8,
-                var lng when lng <= 127 && lng >= -128 => OpCodes.Ldc_I4_S,
+                var lng when lng <= sbyte.MaxValue && lng >= sbyte.MinValue => OpCodes.Ldc_I4_S,
                 _ => OpCodes.Ldc_I4,
             };
         }

@@ -8,9 +8,9 @@ using UnityEngine;
 namespace LINQ2Method
 {
     [InitializeOnLoad]
-    public static class Linq2Method
+    public static class AssemblyPostProcessor
     {
-        static Linq2Method()
+        static AssemblyPostProcessor()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
@@ -59,18 +59,19 @@ namespace LINQ2Method
             mainTestClassDefinition.Methods.Add(methodDefinition);
             
             var forLoop = new For(typeSystem);
+            var array = new Array(mainModule);
             var branch = new If(typeSystem);
             var methodBody = methodDefinition.Body;
-
+            
+            array.Create(methodBody, typeSystem.Int32);
             forLoop.Start(methodBody);
             
             var funcMethod = mainTestClassDefinition.NestedTypes[0].Methods[2].Body;
-            branch.Create(methodBody, funcMethod, forLoop, forLoop.LoopEnd);
+            branch.Define(methodBody, funcMethod, forLoop, forLoop.LoopEnd);
 
             forLoop.End(methodBody, 90);
             
             InstructionHelper.Return(methodBody);
-            
             mainModule.Write("Test.dll");
         }
     }

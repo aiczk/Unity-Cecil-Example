@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using LINQ2Method.Attributes;
 using UnityEngine;
 
 namespace _Script
@@ -9,13 +10,31 @@ namespace _Script
          public void Fnc<T>(T value,Func<T, bool> func)
          {
              func(value);
-             Debug.Log("OI");
          }
  
+         [Optimization]
          private void Foo()
          {
-             Fnc(0, x => x != 10);
+             var enumerable = new [] {2,4,2,3,5,2,66,3,32,2,1,4,6,2,1,35};
+
+             var s = enumerable.Where(x => x < 10);
+             
+             Fnc(9, x => x != 10);
              Fnc(new Hoo(2),x => x == new Hoo(3));
+         }
+         
+         private void CC(int[] arr)
+         {
+             int length = arr.Length;
+             for(var i = 0; i < 10; i++)
+             {
+                 var loc = arr[i];
+                 if(loc == 10)
+                     continue;
+                 //Console.Write("");
+             }
+             
+             //return result;
          }
 
          private void Hoo()
