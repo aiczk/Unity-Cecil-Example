@@ -15,9 +15,9 @@ namespace _Script
          [Optimization]
          private void Foo()
          {
-             var enumerable = new [] {2,4,2,3,5,2,66,3,32,2,1,4,6,2,1,35};
+             var enumerable = new [] {new Hoo(2), new Hoo(41), };
 
-             var s = enumerable.Where(x => x < 10);
+             var s = enumerable.Where(x => x.GetHashCode() < 10);
              
              Fnc(9, x => x != 10);
              Fnc(new Hoo(2),x => x == new Hoo(3));

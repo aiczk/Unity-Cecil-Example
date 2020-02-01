@@ -59,20 +59,21 @@ namespace LINQ2Method
             mainTestClassDefinition.Methods.Add(methodDefinition);
             
             var forLoop = new For(typeSystem);
-            var array = new Array(mainModule);
+            var array = new Array(typeSystem);
             var branch = new If(typeSystem);
             var methodBody = methodDefinition.Body;
+            var funcMethod = mainTestClassDefinition.NestedTypes[0].Methods[2];
             
-            array.Create(methodBody, typeSystem.Int32);
+            array.Create(methodBody, funcMethod.Parameters[0].ParameterType);
             forLoop.Start(methodBody);
             
-            var funcMethod = mainTestClassDefinition.NestedTypes[0].Methods[2].Body;
-            branch.Define(methodBody, funcMethod, forLoop, forLoop.LoopEnd);
+            branch.Define(methodBody, funcMethod.Body, forLoop, forLoop.LoopEnd);
 
             forLoop.End(methodBody, 90);
             
             InstructionHelper.Return(methodBody);
             mainModule.Write("Test.dll");
+            
         }
     }
 }

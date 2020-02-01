@@ -7,13 +7,11 @@ namespace LINQ2Method.Basics
 {
     public class Array
     {
-        private ModuleDefinition mainModule;
         private TypeSystem typeSystem;
         
-        public Array(ModuleDefinition mainModule)
+        public Array(TypeSystem typeSystem)
         {
-            this.mainModule = mainModule;
-            typeSystem = mainModule.TypeSystem;
+            this.typeSystem = typeSystem;
         }
 
         public void Create(MethodBody methodBody, TypeReference arrayType)
