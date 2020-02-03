@@ -18,7 +18,7 @@ namespace LINQ2Method.Basics
         
         public void Define(MethodBody methodBody, MethodBody funcMethod, For forLoop, Instruction nextProcess)
         {
-            var (checkIndex, variable) = methodBody.AddVariable(typeSystem.Boolean);
+            var checkVariable = methodBody.AddVariable(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
             
             foreach (var instruction in Convert(methodBody, funcMethod))
@@ -26,8 +26,8 @@ namespace LINQ2Method.Basics
                 processor.Append(instruction);
             }
             
-            processor.Append(InstructionHelper.StLoc(checkIndex, variable));
-            processor.Append(InstructionHelper.LdLoc(checkIndex, variable));
+            processor.Append(InstructionHelper.StLoc(checkVariable));
+            processor.Append(InstructionHelper.LdLoc(checkVariable));
             
             //true
             processor.Emit(OpCodes.Brfalse_S, nextProcess);
@@ -51,8 +51,8 @@ namespace LINQ2Method.Basics
                     if (param1 == null)
                     {
                         param1 = funcMethod.Method.Parameters[0].ParameterType;
-                        var (index, variable) = methodBody.AddVariable(param1);
-                        type = InstructionHelper.LdLoc(index, variable);
+                        var variable = methodBody.AddVariable(param1);
+                        type = InstructionHelper.LdLoc(variable);
                     }
                     
                     //ldLoc前にはstLocが欲しい

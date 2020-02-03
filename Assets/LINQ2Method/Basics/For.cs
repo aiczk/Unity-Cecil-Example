@@ -14,8 +14,7 @@ namespace LINQ2Method.Basics
         private Instruction loopStart;
         private Instruction loopCheck;
         private TypeSystem typeSystem;
-        private VariableDefinition indexVariable;
-        private int forIndex;
+        private Variable indexVariable;
 
         public For(TypeSystem typeSystem)
         {
@@ -27,14 +26,14 @@ namespace LINQ2Method.Basics
 
         public void Start(MethodBody methodBody, int initValue = 0)
         {
-            (forIndex,indexVariable) = methodBody.AddVariable(typeSystem.Int32);
-            loopCheck = InstructionHelper.LdLoc(forIndex, indexVariable);
-            IncrementIndex = InstructionHelper.LdLoc(forIndex, indexVariable);
+            indexVariable = methodBody.AddVariable(typeSystem.Int32);
+            loopCheck = InstructionHelper.LdLoc(indexVariable);
+            IncrementIndex = InstructionHelper.LdLoc(indexVariable);
             var processor = methodBody.GetILProcessor();
 
             //i = n
             processor.Append(InstructionHelper.LdcI4(initValue));
-            processor.Append(InstructionHelper.StLoc(forIndex, indexVariable));
+            processor.Append(InstructionHelper.StLoc(indexVariable));
             
             //i < n check
             processor.Emit(OpCodes.Br_S, loopCheck);
@@ -43,9 +42,9 @@ namespace LINQ2Method.Basics
             processor.Append(loopStart);
         }
         
-        public void End(MethodBody methodBody, int loopCount)
+        public void End(MethodBody methodBody, Instruction loopCountInstruction)
         {
-            var (withInIndex, withInVariable) = methodBody.AddVariable(typeSystem.Boolean);
+            var withInVariable = methodBody.AddVariable(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
 
             //loop end
@@ -55,16 +54,16 @@ namespace LINQ2Method.Basics
             processor.Append(IncrementIndex);
             processor.Emit(OpCodes.Ldc_I4_1);
             processor.Emit(OpCodes.Add);
-            processor.Append(InstructionHelper.StLoc(forIndex, indexVariable));
+            processor.Append(InstructionHelper.StLoc(indexVariable));
 
             //i < n
             processor.Append(loopCheck);
-            processor.Append(InstructionHelper.LdcI4(loopCount));
+            processor.Append(loopCountInstruction);
             processor.Emit(OpCodes.Clt);
-            processor.Append(InstructionHelper.StLoc(withInIndex, withInVariable));
+            processor.Append(InstructionHelper.StLoc(withInVariable));
             
             //check within range
-            processor.Append(InstructionHelper.LdLoc(withInIndex, withInVariable));
+            processor.Append(InstructionHelper.LdLoc(withInVariable));
             processor.Emit(OpCodes.Brtrue_S, loopStart);
         }
     }

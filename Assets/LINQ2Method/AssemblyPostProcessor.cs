@@ -2,6 +2,7 @@
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using UnityEditor;
 using UnityEngine;
 
@@ -69,7 +70,7 @@ namespace LINQ2Method
             
             branch.Define(methodBody, funcMethod.Body, forLoop, forLoop.LoopEnd);
 
-            forLoop.End(methodBody, 90);
+            forLoop.End(methodBody, InstructionHelper.LdLoc(array.LocalVariable));
             
             InstructionHelper.Return(methodBody);
             mainModule.Write("Test.dll");

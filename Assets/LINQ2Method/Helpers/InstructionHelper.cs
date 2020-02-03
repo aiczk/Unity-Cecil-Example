@@ -25,6 +25,12 @@ namespace LINQ2Method.Helpers
             var ldLoc = OpCodeHelper.LdLoc(index);
             return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, variable) : Instruction.Create(ldLoc);
         }
+        
+        public static Instruction LdLoc(Variable variable)
+        {
+            var ldLoc = OpCodeHelper.LdLoc(variable.Index);
+            return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, variable.Definition) : Instruction.Create(ldLoc);
+        }
 
         public static Instruction StLoc(int index, VariableDefinition variable)
         {
@@ -32,12 +38,18 @@ namespace LINQ2Method.Helpers
             return stLoc.Equals(OpCodes.Stloc_S) ? Instruction.Create(stLoc, variable) : Instruction.Create(stLoc);
         }
         
-        public static (int, VariableDefinition) AddVariable(this MethodBody methodBody, TypeReference reference)
+        public static Instruction StLoc(Variable variable)
+        {
+            var stLoc = OpCodeHelper.StLoc(variable.Index);
+            return stLoc.Equals(OpCodes.Stloc_S) ? Instruction.Create(stLoc, variable.Definition) : Instruction.Create(stLoc);
+        }
+        
+        public static Variable AddVariable(this MethodBody methodBody, TypeReference reference)
         {
             var index = methodBody.Variables.Count;
             var variable = new VariableDefinition(reference);
             methodBody.Variables.Add(variable);
-            return (index, variable);
+            return new Variable(index, variable);
         }
 
         public static T OperandValue<T>(Instruction instruction)
@@ -61,5 +73,17 @@ namespace LINQ2Method.Helpers
         }
 
         public static void Return(MethodBody methodBody) => methodBody.GetILProcessor().Emit(OpCodes.Ret);
+    }
+
+    public class Variable
+    {
+        public int Index { get; }
+        public VariableDefinition Definition { get; }
+
+        public Variable(int index, VariableDefinition definition)
+        {
+            Index = index;
+            Definition = definition;
+        }
     }
 }
