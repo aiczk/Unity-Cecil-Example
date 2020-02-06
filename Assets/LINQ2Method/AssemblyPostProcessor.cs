@@ -17,6 +17,7 @@ namespace LINQ2Method
                 return;
             
             PostCompile();
+            
         }
 
         private static void PostCompile()
@@ -74,7 +75,6 @@ namespace LINQ2Method
             
             InstructionHelper.Return(methodBody);
             mainModule.Write("Test.dll");
-            
         }
     }
 }

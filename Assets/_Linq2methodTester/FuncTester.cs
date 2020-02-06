@@ -26,12 +26,13 @@ namespace _Script
          private void CC(Hoo[] arr)
          {
              int length = arr.Length;
-             for(var i = 0; i < 10; i++)
+             for(var i = 0; i < length; i++)
              {
                  var loc = arr[i];
-                 if(loc.GetHashCode() == 10)
+                 if(loc.GetHashCode() < 10)
                      continue;
-                 //Console.Write("");
+                 
+                 //do
              }
              
              //return result;

@@ -10,11 +10,11 @@ namespace LINQ2Method.Basics
     {
         public Instruction LoopEnd { get; }
         public Instruction IncrementIndex { get; private set; }
+        public Variable IndexVariable { get; private set; }
         
         private Instruction loopStart;
         private Instruction loopCheck;
         private TypeSystem typeSystem;
-        private Variable indexVariable;
 
         public For(TypeSystem typeSystem)
         {
@@ -26,14 +26,14 @@ namespace LINQ2Method.Basics
 
         public void Start(MethodBody methodBody, int initValue = 0)
         {
-            indexVariable = methodBody.AddVariable(typeSystem.Int32);
-            loopCheck = InstructionHelper.LdLoc(indexVariable);
-            IncrementIndex = InstructionHelper.LdLoc(indexVariable);
+            IndexVariable = methodBody.AddVariable(typeSystem.Int32);
+            loopCheck = InstructionHelper.LdLoc(IndexVariable);
+            IncrementIndex = InstructionHelper.LdLoc(IndexVariable);
             var processor = methodBody.GetILProcessor();
 
             //i = n
             processor.Append(InstructionHelper.LdcI4(initValue));
-            processor.Append(InstructionHelper.StLoc(indexVariable));
+            processor.Append(InstructionHelper.StLoc(IndexVariable));
             
             //i < n check
             processor.Emit(OpCodes.Br_S, loopCheck);
@@ -54,7 +54,7 @@ namespace LINQ2Method.Basics
             processor.Append(IncrementIndex);
             processor.Emit(OpCodes.Ldc_I4_1);
             processor.Emit(OpCodes.Add);
-            processor.Append(InstructionHelper.StLoc(indexVariable));
+            processor.Append(InstructionHelper.StLoc(IndexVariable));
 
             //i < n
             processor.Append(loopCheck);

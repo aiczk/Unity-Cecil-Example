@@ -21,7 +21,7 @@ namespace LINQ2Method.Basics
             var checkVariable = methodBody.AddVariable(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
             
-            foreach (var instruction in Convert(methodBody, funcMethod))
+            foreach (var instruction in Convert(methodBody, funcMethod, forLoop))
             {
                 processor.Append(instruction);
             }
@@ -36,11 +36,11 @@ namespace LINQ2Method.Basics
             processor.Emit(OpCodes.Br_S, forLoop.IncrementIndex);
         }
         
-        private List<Instruction> Convert(MethodBody methodBody, MethodBody funcMethod)
+        private List<Instruction> Convert(MethodBody methodBody, MethodBody funcMethod, For forLoop)
         {
             var result = new List<Instruction>();
             TypeReference param1 = null;
-            Instruction type = null;
+            Variable variable = null;
 
             foreach (var instruction in funcMethod.Instructions)
             {
@@ -51,12 +51,14 @@ namespace LINQ2Method.Basics
                     if (param1 == null)
                     {
                         param1 = funcMethod.Method.Parameters[0].ParameterType;
-                        var variable = methodBody.AddVariable(param1);
-                        type = InstructionHelper.LdLoc(variable);
+                        variable = methodBody.AddVariable(param1);
                     }
                     
-                    //ldLoc前にはstLocが欲しい
-                    result.Add(type);
+                    result.Add(Instruction.Create(OpCodes.Ldarg_1));
+                    result.Add(InstructionHelper.LdLoc(forLoop.IndexVariable));
+                    result.Add(Instruction.Create(OpCodes.Ldelem_Ref));
+                    result.Add(InstructionHelper.StLoc(variable));
+                    result.Add(InstructionHelper.LdLoc(variable));
                     continue;
                 }
                 
