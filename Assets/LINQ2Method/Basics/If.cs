@@ -39,7 +39,7 @@ namespace LINQ2Method.Basics
         private List<Instruction> Convert(MethodBody methodBody, MethodBody funcMethod, For forLoop)
         {
             var result = new List<Instruction>();
-            TypeReference param1 = null;
+            TypeReference arg = null;
             Variable variable = null;
 
             foreach (var instruction in funcMethod.Instructions)
@@ -48,15 +48,16 @@ namespace LINQ2Method.Basics
                 
                 if (opCode == OpCodes.Ldarg_1)
                 {
-                    if (param1 == null)
+                    if (arg == null)
                     {
-                        param1 = funcMethod.Method.Parameters[0].ParameterType;
-                        variable = methodBody.AddVariable(param1);
+                        arg = funcMethod.Method.Parameters[0].ParameterType;
+                        variable = methodBody.AddVariable(arg);
                     }
                     
-                    result.Add(Instruction.Create(OpCodes.Ldarg_1));
+                    Debug.Log(arg);
+                    result.Add(InstructionHelper.LdArg(1));
                     result.Add(InstructionHelper.LdLoc(forLoop.IndexVariable));
-                    result.Add(Instruction.Create(OpCodes.Ldelem_Ref));
+                    result.Add(InstructionHelper.LdElem(arg));
                     result.Add(InstructionHelper.StLoc(variable));
                     result.Add(InstructionHelper.LdLoc(variable));
                     continue;

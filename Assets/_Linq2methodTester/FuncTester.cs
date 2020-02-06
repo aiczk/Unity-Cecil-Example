@@ -15,7 +15,7 @@ namespace _Script
          [Optimization]
          private void Foo()
          {
-             var enumerable = new [] {new Hoo(2), new Hoo(41), };
+             var enumerable = new [] {(2), (41), };
 
              var s = enumerable.Where(x => x.GetHashCode() < 10);
              

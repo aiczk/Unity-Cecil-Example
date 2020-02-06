@@ -1,5 +1,7 @@
-﻿using Mono.Cecil;
+﻿using System;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
+using UnityEngine;
 
 namespace LINQ2Method.Helpers
 {
@@ -18,7 +20,7 @@ namespace LINQ2Method.Helpers
                 6 => OpCodes.Ldc_I4_6,
                 7 => OpCodes.Ldc_I4_7,
                 8 => OpCodes.Ldc_I4_8,
-                var lng when lng <= sbyte.MaxValue && lng >= sbyte.MinValue => OpCodes.Ldc_I4_S,
+                var len when len <= sbyte.MaxValue && len >= sbyte.MinValue => OpCodes.Ldc_I4_S,
                 _ => OpCodes.Ldc_I4,
             };
         }
@@ -44,6 +46,35 @@ namespace LINQ2Method.Helpers
                 2 => OpCodes.Stloc_2,
                 3 => OpCodes.Stloc_3,
                 _ => OpCodes.Stloc_S
+            };
+        }
+        
+        public static OpCode LdElem(TypeReference typeReference)
+        {
+            return typeReference.Name switch
+            {
+                nameof(SByte) => OpCodes.Ldelem_I1,
+                nameof(Int16) => OpCodes.Ldelem_I2,
+                nameof(Int32) => OpCodes.Ldelem_I4,
+                nameof(Int64) => OpCodes.Ldelem_I8,
+                nameof(Byte) => OpCodes.Ldelem_U1,
+                nameof(UInt16) => OpCodes.Ldelem_U2,
+                nameof(UInt32) => OpCodes.Ldelem_U4,
+                nameof(Single) => OpCodes.Ldelem_R4,
+                nameof(Double) => OpCodes.Ldelem_R8,
+                _ => OpCodes.Ldelem_Ref
+            };
+        }
+
+        public static OpCode LdArg(int index)
+        {
+            return index switch
+            {
+                0 => OpCodes.Ldarg_0,
+                1 => OpCodes.Ldarg_1,
+                2 => OpCodes.Ldarg_2,
+                3 => OpCodes.Ldarg_3,
+                _ => OpCodes.Ldarg_S,
             };
         }
     }

@@ -23,21 +23,10 @@ namespace LINQ2Method.Basics
 
             var processor = methodBody.GetILProcessor();
             
-            processor.Emit(OpCodes.Ldarg_1);
+            processor.Append(InstructionHelper.LdArg(1));
             processor.Emit(OpCodes.Ldlen);
             processor.Emit(OpCodes.Conv_I4);
             processor.Append(InstructionHelper.StLoc(LocalVariable));
-        }
-
-        public void Assign(MethodBody methodBody)
-        {
-            var processor = methodBody.GetILProcessor();
-            
-            processor.Emit(OpCodes.Ldarg_1);
-            //processor.Emit(/*フィールドにあるやつをldLocする*/);
-            //型によって返すLdElemが違う
-            //processor.Emit(OpCodes.Ldelem_I4);
-            //processor.Emit(InstructionHelper.StLoc(/*なにか*/));
         }
     }
 }

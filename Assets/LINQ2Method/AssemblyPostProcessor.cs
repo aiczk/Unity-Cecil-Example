@@ -17,7 +17,6 @@ namespace LINQ2Method
                 return;
             
             PostCompile();
-            
         }
 
         private static void PostCompile()

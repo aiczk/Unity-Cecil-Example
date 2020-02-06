@@ -44,6 +44,18 @@ namespace LINQ2Method.Helpers
             return stLoc.Equals(OpCodes.Stloc_S) ? Instruction.Create(stLoc, variable.Definition) : Instruction.Create(stLoc);
         }
         
+        public static Instruction LdElem(TypeReference typeReference)
+        {
+            var ldElem = OpCodeHelper.LdElem(typeReference);
+            return Instruction.Create(ldElem);
+        }
+
+        public static Instruction LdArg(int index)
+        {
+            var ldArg = OpCodeHelper.LdArg(index);
+            return ldArg.Equals(OpCodes.Ldarg_S) ? Instruction.Create(ldArg, index) : Instruction.Create(ldArg);
+        }
+        
         public static Variable AddVariable(this MethodBody methodBody, TypeReference reference)
         {
             var index = methodBody.Variables.Count;
