@@ -23,7 +23,7 @@ namespace _Script
              Fnc(new Hoo(2),x => x == new Hoo(3));
          }
          
-         private void CC(Hoo[] arr)
+         private void CC(int[] arr)
          {
              int length = arr.Length;
              for(var i = 0; i < length; i++)

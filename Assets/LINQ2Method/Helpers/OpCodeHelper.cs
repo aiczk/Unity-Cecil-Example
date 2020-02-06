@@ -49,9 +49,10 @@ namespace LINQ2Method.Helpers
             };
         }
         
-        public static OpCode LdElem(TypeReference typeReference)
+        public static OpCode LdElem(TypeReference arg)
         {
-            return typeReference.Name switch
+            Debug.Log(arg.Name);
+            return arg.Name switch
             {
                 nameof(SByte) => OpCodes.Ldelem_I1,
                 nameof(Int16) => OpCodes.Ldelem_I2,
@@ -66,9 +67,9 @@ namespace LINQ2Method.Helpers
             };
         }
 
-        public static OpCode LdArg(int index)
+        public static OpCode LdArg(int argIndex)
         {
-            return index switch
+            return argIndex switch
             {
                 0 => OpCodes.Ldarg_0,
                 1 => OpCodes.Ldarg_1,

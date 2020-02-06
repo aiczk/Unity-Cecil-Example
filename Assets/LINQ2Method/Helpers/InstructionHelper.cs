@@ -20,24 +20,21 @@ namespace LINQ2Method.Helpers
             };
         }
 
-        public static Instruction LdLoc(int index, VariableDefinition variable)
-        {
-            var ldLoc = OpCodeHelper.LdLoc(index);
-            return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, variable) : Instruction.Create(ldLoc);
-        }
-        
         public static Instruction LdLoc(Variable variable)
         {
             var ldLoc = OpCodeHelper.LdLoc(variable.Index);
             return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, variable.Definition) : Instruction.Create(ldLoc);
         }
-
-        public static Instruction StLoc(int index, VariableDefinition variable)
-        {
-            var stLoc = OpCodeHelper.StLoc(index);
-            return stLoc.Equals(OpCodes.Stloc_S) ? Instruction.Create(stLoc, variable) : Instruction.Create(stLoc);
-        }
         
+        public static Instruction LdLoca(Variable variable)
+        {
+            if (variable.Definition.VariableType.IsValueType)
+                return Instruction.Create(OpCodes.Ldloca_S, variable.Definition);
+            
+            var ldLoc = OpCodeHelper.LdLoc(variable.Index);
+            return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, variable.Definition) : Instruction.Create(ldLoc);
+        }
+
         public static Instruction StLoc(Variable variable)
         {
             var stLoc = OpCodeHelper.StLoc(variable.Index);
@@ -50,10 +47,10 @@ namespace LINQ2Method.Helpers
             return Instruction.Create(ldElem);
         }
 
-        public static Instruction LdArg(int index)
+        public static Instruction LdArg(int argIndex)
         {
-            var ldArg = OpCodeHelper.LdArg(index);
-            return ldArg.Equals(OpCodes.Ldarg_S) ? Instruction.Create(ldArg, index) : Instruction.Create(ldArg);
+            var ldArg = OpCodeHelper.LdArg(argIndex);
+            return ldArg.Equals(OpCodes.Ldarg_S) ? Instruction.Create(ldArg, argIndex) : Instruction.Create(ldArg);
         }
         
         public static Variable AddVariable(this MethodBody methodBody, TypeReference reference)
@@ -63,7 +60,7 @@ namespace LINQ2Method.Helpers
             methodBody.Variables.Add(variable);
             return new Variable(index, variable);
         }
-
+        
         public static T OperandValue<T>(Instruction instruction)
         where T : struct
         {
