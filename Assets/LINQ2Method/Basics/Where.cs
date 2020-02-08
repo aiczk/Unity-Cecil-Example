@@ -21,7 +21,7 @@ namespace LINQ2Method.Basics
             var checkVariable = methodBody.AddVariable(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
             
-            foreach (var instruction in Convert(funcMethod, forLoop))
+            foreach (var instruction in InstructionHelper.FuncConvert(funcMethod, forLoop))
             {
                 processor.Append(instruction);
             }
@@ -34,32 +34,6 @@ namespace LINQ2Method.Basics
             
             //false continue
             processor.Emit(OpCodes.Br_S, forLoop.IncrementIndex);
-        }
-        
-        private static Instruction[] Convert(MethodBody funcMethod, For forLoop)
-        {
-            var size = funcMethod.Instructions.Count - 1;
-            var instructions = new Instruction[size];
-
-            for (var i = 0; i < size; i++)
-            {
-                ref var result = ref instructions[i];
-                var instruction = funcMethod.Instructions[i];
-                var opCode = instruction.OpCode;
-                
-                if (opCode == OpCodes.Ret)
-                    continue;
-
-                if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
-                {
-                    result = InstructionHelper.LdLoca(forLoop.LocalDefinition);
-                    continue;
-                }
-
-                result = instruction;
-            }
-            
-            return instructions;
         }
     }
 }

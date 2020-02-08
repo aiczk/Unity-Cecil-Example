@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LINQ2Method.Attributes;
 using UnityEngine;
@@ -16,15 +17,15 @@ namespace _Script
          [Optimization]
          private void Foo()
          {
-             var enumerable = new [] {(2), (41), };
+             var enumerable = new [] {(2), (41) };
 
-             var s = enumerable.Where(x => x.GetHashCode() < 10).Select(x => Random.Range(0,10));
+             var s = enumerable.Where(x => x.GetHashCode() < 10).Select(x => x = Random.Range(0,10));
              
              Fnc(9, x => x != 10);
              Fnc(new Hoo(2),x => x == new Hoo(3));
          }
          
-         private void CC(Hoo[] arr)
+         private void CC(int[] arr)
          {
              int length = arr.Length;
              for(var i = 0; i < length; i++)
@@ -33,11 +34,9 @@ namespace _Script
 
                  if(loc.GetHashCode() < 10)
                      continue;
-                 
-                 //do
+
+                 loc = Random.Range(0, 10);
              }
-             
-             //return result;
          }
 
          private void Hoo()
@@ -59,7 +58,7 @@ namespace _Script
 
      public class Hoo : IEquatable<Hoo>
      {
-         private int rdm;
+         public int rdm;
 
          public Hoo(int rdm)
          {

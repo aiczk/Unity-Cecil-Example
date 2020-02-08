@@ -59,15 +59,18 @@ namespace LINQ2Method
             var forLoop = new For(typeSystem);
             var array = new Array(typeSystem);
             var where = new Where(typeSystem);
+            var select = new Select();
             var methodBody = methodDefinition.Body;
-            var funcMethod = mainTestClassDefinition.NestedTypes[0].Methods[2];
-            var paramType = funcMethod.Parameters[0].ParameterType;
+            var whereFuncMethod = mainTestClassDefinition.NestedTypes[0].Methods[2];
+            var selectFuncMethod = mainTestClassDefinition.NestedTypes[0].Methods[3];
+            var paramType = whereFuncMethod.Parameters[0].ParameterType;
             
             array.Define(methodBody, paramType);
             forLoop.Start(methodBody);
             forLoop.Local(methodBody, paramType);
             
-            where.Define(methodBody, funcMethod.Body, forLoop, forLoop.LoopEnd);
+            //select.Define(methodBody, selectFuncMethod.Body, forLoop);
+            where.Define(methodBody, whereFuncMethod.Body, forLoop, forLoop.LoopEnd);
 
             forLoop.End(methodBody, array.ElementLengthDefinition);
             

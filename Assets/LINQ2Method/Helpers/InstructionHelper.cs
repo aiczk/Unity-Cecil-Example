@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LINQ2Method.Basics;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
@@ -59,6 +60,34 @@ namespace LINQ2Method.Helpers
             var variable = new VariableDefinition(reference);
             methodBody.Variables.Add(variable);
             return variable;
+        }
+        
+        public static Instruction[] FuncConvert(MethodBody funcMethod, For forLoop)
+        {
+            var size = funcMethod.Instructions.Count - 1;
+            var result = new Instruction[size];
+            var instructions = funcMethod.Instructions;
+
+            for (var i = 0; i < size; i++)
+            {
+                ref var res = ref result[i];
+                var instruction = instructions[i];
+                var opCode = instruction.OpCode;
+
+                if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
+                {
+                    res = InstructionHelper.LdLoca(forLoop.LocalDefinition);
+                    continue;
+                }
+                
+                if (opCode == OpCodes.Ret)
+                    continue;
+
+                res = instruction;
+            }
+            
+            return result;
+
         }
         
         public static T OperandValue<T>(Instruction instruction)
