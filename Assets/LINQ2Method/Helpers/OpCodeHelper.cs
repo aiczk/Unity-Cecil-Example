@@ -51,7 +51,6 @@ namespace LINQ2Method.Helpers
         
         public static OpCode LdElem(TypeReference arg)
         {
-            Debug.Log(arg.Name);
             return arg.Name switch
             {
                 nameof(SByte) => OpCodes.Ldelem_I1,

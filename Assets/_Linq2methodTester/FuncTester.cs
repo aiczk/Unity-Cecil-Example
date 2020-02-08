@@ -2,6 +2,7 @@
 using System.Linq;
 using LINQ2Method.Attributes;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace _Script
  {
@@ -17,18 +18,19 @@ namespace _Script
          {
              var enumerable = new [] {(2), (41), };
 
-             var s = enumerable.Where(x => x.GetHashCode() < 10);
+             var s = enumerable.Where(x => x.GetHashCode() < 10).Select(x => Random.Range(0,10));
              
              Fnc(9, x => x != 10);
              Fnc(new Hoo(2),x => x == new Hoo(3));
          }
          
-         private void CC(int[] arr)
+         private void CC(Hoo[] arr)
          {
              int length = arr.Length;
              for(var i = 0; i < length; i++)
              {
                  var loc = arr[i];
+
                  if(loc.GetHashCode() < 10)
                      continue;
                  

@@ -1,10 +1,7 @@
-﻿using _Script;
-using LINQ2Method.Basics;
+﻿using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using UnityEditor;
-using UnityEngine;
 
 namespace LINQ2Method
 {
@@ -12,7 +9,7 @@ namespace LINQ2Method
     public static class AssemblyPostProcessor
     {
         static AssemblyPostProcessor()
-        {
+        { 
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
@@ -61,14 +58,14 @@ namespace LINQ2Method
             
             var forLoop = new For(typeSystem);
             var array = new Array(typeSystem);
-            var branch = new If(typeSystem);
+            var where = new Where(typeSystem);
             var methodBody = methodDefinition.Body;
             var funcMethod = mainTestClassDefinition.NestedTypes[0].Methods[2];
             
             array.Create(methodBody, funcMethod.Parameters[0].ParameterType);
             forLoop.Start(methodBody);
             
-            branch.Define(methodBody, funcMethod.Body, forLoop, forLoop.LoopEnd);
+            where.Define(methodBody, funcMethod.Body, forLoop, forLoop.LoopEnd);
 
             forLoop.End(methodBody, InstructionHelper.LdLoc(array.LocalVariable));
             

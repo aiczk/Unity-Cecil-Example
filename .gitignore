@@ -4,3 +4,4 @@ Temp/
 .idea/
 *.sln
 obj/
+*.user

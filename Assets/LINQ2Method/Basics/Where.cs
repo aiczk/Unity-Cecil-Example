@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
-    public class If
+    public class Where
     {
         private TypeSystem typeSystem;
         
-        public If(TypeSystem typeSystem)
+        public Where(TypeSystem typeSystem)
         {
             this.typeSystem = typeSystem;
         }
@@ -36,7 +36,7 @@ namespace LINQ2Method.Basics
             processor.Emit(OpCodes.Br_S, forLoop.IncrementIndex);
         }
         
-        private List<Instruction> Convert(MethodBody methodBody, MethodBody funcMethod, For forLoop)
+        private static List<Instruction> Convert(MethodBody methodBody, MethodBody funcMethod, For forLoop)
         {
             var result = new List<Instruction>();
             TypeReference arg1 = null;
@@ -69,6 +69,14 @@ namespace LINQ2Method.Basics
             }
             
             return result;
+        }
+    }
+
+    public class Select
+    {
+        public Select()
+        {
+            
         }
     }
 }
