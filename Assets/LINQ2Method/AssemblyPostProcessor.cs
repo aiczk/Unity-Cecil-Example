@@ -61,13 +61,15 @@ namespace LINQ2Method
             var where = new Where(typeSystem);
             var methodBody = methodDefinition.Body;
             var funcMethod = mainTestClassDefinition.NestedTypes[0].Methods[2];
+            var paramType = funcMethod.Parameters[0].ParameterType;
             
-            array.Create(methodBody, funcMethod.Parameters[0].ParameterType);
+            array.Define(methodBody, paramType);
             forLoop.Start(methodBody);
+            forLoop.Local(methodBody, paramType);
             
             where.Define(methodBody, funcMethod.Body, forLoop, forLoop.LoopEnd);
 
-            forLoop.End(methodBody, InstructionHelper.LdLoc(array.LocalVariable));
+            forLoop.End(methodBody, array.ElementLengthDefinition);
             
             InstructionHelper.Return(methodBody);
             mainModule.Write("Test.dll");

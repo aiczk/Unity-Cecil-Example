@@ -7,7 +7,7 @@ namespace LINQ2Method.Basics
 {
     public class Array
     {
-        public Variable LocalVariable { get; private set; }
+        public VariableDefinition ElementLengthDefinition { get; private set; }
         
         private TypeSystem typeSystem;
 
@@ -16,17 +16,17 @@ namespace LINQ2Method.Basics
             this.typeSystem = typeSystem;
         }
 
-        public void Create(MethodBody methodBody, TypeReference arrayType)
+        public void Define(MethodBody methodBody, TypeReference arrayType)
         {
             methodBody.Method.Parameters.Add(new ParameterDefinition(new ArrayType(arrayType)));
-            LocalVariable = methodBody.AddVariable(typeSystem.Int32);
+            ElementLengthDefinition = methodBody.AddVariable(typeSystem.Int32);
 
             var processor = methodBody.GetILProcessor();
             
             processor.Append(InstructionHelper.LdArg(1));
             processor.Emit(OpCodes.Ldlen);
             processor.Emit(OpCodes.Conv_I4);
-            processor.Append(InstructionHelper.StLoc(LocalVariable));
+            processor.Append(InstructionHelper.StLoc(ElementLengthDefinition));
         }
     }
 }

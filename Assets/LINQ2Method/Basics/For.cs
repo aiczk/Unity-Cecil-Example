@@ -10,7 +10,8 @@ namespace LINQ2Method.Basics
     {
         public Instruction LoopEnd { get; }
         public Instruction IncrementIndex { get; private set; }
-        public Variable IndexVariable { get; private set; }
+        public VariableDefinition IndexDefinition { get; private set; }
+        public VariableDefinition LocalDefinition { get; private set; }
         
         private Instruction loopStart;
         private Instruction loopCheck;
@@ -26,14 +27,14 @@ namespace LINQ2Method.Basics
 
         public void Start(MethodBody methodBody, int initValue = 0)
         {
-            IndexVariable = methodBody.AddVariable(typeSystem.Int32);
-            loopCheck = InstructionHelper.LdLoc(IndexVariable);
-            IncrementIndex = InstructionHelper.LdLoc(IndexVariable);
+            IndexDefinition = methodBody.AddVariable(typeSystem.Int32);
+            loopCheck = InstructionHelper.LdLoc(IndexDefinition);
+            IncrementIndex = InstructionHelper.LdLoc(IndexDefinition);
             var processor = methodBody.GetILProcessor();
 
             //i = n
             processor.Append(InstructionHelper.LdcI4(initValue));
-            processor.Append(InstructionHelper.StLoc(IndexVariable));
+            processor.Append(InstructionHelper.StLoc(IndexDefinition));
             
             //i < n check
             processor.Emit(OpCodes.Br_S, loopCheck);
@@ -42,7 +43,7 @@ namespace LINQ2Method.Basics
             processor.Append(loopStart);
         }
         
-        public void End(MethodBody methodBody, Instruction loopCountInstruction)
+        public void End(MethodBody methodBody, VariableDefinition arrayLengthDefinition)
         {
             var withInVariable = methodBody.AddVariable(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
@@ -54,17 +55,28 @@ namespace LINQ2Method.Basics
             processor.Append(IncrementIndex);
             processor.Emit(OpCodes.Ldc_I4_1);
             processor.Emit(OpCodes.Add);
-            processor.Append(InstructionHelper.StLoc(IndexVariable));
+            processor.Append(InstructionHelper.StLoc(IndexDefinition));
 
             //i < n
             processor.Append(loopCheck);
-            processor.Append(loopCountInstruction);
+            processor.Append(InstructionHelper.LdLoc(arrayLengthDefinition));
             processor.Emit(OpCodes.Clt);
             processor.Append(InstructionHelper.StLoc(withInVariable));
             
             //check within range
             processor.Append(InstructionHelper.LdLoc(withInVariable));
             processor.Emit(OpCodes.Brtrue_S, loopStart);
+        }
+
+        public void Local(MethodBody methodBody, TypeReference argType)
+        { 
+            LocalDefinition = methodBody.AddVariable(argType);
+            var processor = methodBody.GetILProcessor();
+            
+            processor.Append(InstructionHelper.LdArg(1));
+            processor.Append(InstructionHelper.LdLoc(IndexDefinition));
+            processor.Append(InstructionHelper.LdElem(argType));
+            processor.Append(InstructionHelper.StLoc(LocalDefinition));
         }
     }
 }

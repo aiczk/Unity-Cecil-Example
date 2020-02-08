@@ -1,4 +1,4 @@
-﻿using Boo.Lang;
+﻿using System.Collections.Generic;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -21,7 +21,7 @@ namespace LINQ2Method.Basics
             var checkVariable = methodBody.AddVariable(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
             
-            foreach (var instruction in Convert(methodBody, funcMethod, forLoop))
+            foreach (var instruction in Convert(funcMethod, forLoop))
             {
                 processor.Append(instruction);
             }
@@ -36,47 +36,30 @@ namespace LINQ2Method.Basics
             processor.Emit(OpCodes.Br_S, forLoop.IncrementIndex);
         }
         
-        private static List<Instruction> Convert(MethodBody methodBody, MethodBody funcMethod, For forLoop)
+        private static Instruction[] Convert(MethodBody funcMethod, For forLoop)
         {
-            var result = new List<Instruction>();
-            TypeReference arg1 = null;
-            Variable variable = null;
+            var size = funcMethod.Instructions.Count - 1;
+            var instructions = new Instruction[size];
 
-            foreach (var instruction in funcMethod.Instructions)
+            for (var i = 0; i < size; i++)
             {
+                ref var result = ref instructions[i];
+                var instruction = funcMethod.Instructions[i];
                 var opCode = instruction.OpCode;
                 
+                if (opCode == OpCodes.Ret)
+                    continue;
+
                 if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
                 {
-                    if (arg1 == null)
-                    {
-                        arg1 = funcMethod.Method.Parameters[0].ParameterType;
-                        variable = methodBody.AddVariable(arg1);
-                    }
-                    
-                    result.Add(InstructionHelper.LdArg(1));
-                    result.Add(InstructionHelper.LdLoc(forLoop.IndexVariable));
-                    result.Add(InstructionHelper.LdElem(arg1));
-                    result.Add(InstructionHelper.StLoc(variable));
-                    result.Add(InstructionHelper.LdLoca(variable));
+                    result = InstructionHelper.LdLoca(forLoop.LocalDefinition);
                     continue;
                 }
-                
-                if(opCode == OpCodes.Ret)
-                    continue;
 
-                result.Add(instruction);
+                result = instruction;
             }
             
-            return result;
-        }
-    }
-
-    public class Select
-    {
-        public Select()
-        {
-            
+            return instructions;
         }
     }
 }

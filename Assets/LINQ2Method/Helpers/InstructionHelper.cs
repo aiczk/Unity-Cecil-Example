@@ -20,25 +20,25 @@ namespace LINQ2Method.Helpers
             };
         }
 
-        public static Instruction LdLoc(Variable variable)
+        public static Instruction LdLoc(VariableDefinition definition)
         {
-            var ldLoc = OpCodeHelper.LdLoc(variable.Index);
-            return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, variable.Definition) : Instruction.Create(ldLoc);
+            var ldLoc = OpCodeHelper.LdLoc(definition.Index);
+            return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, definition) : Instruction.Create(ldLoc);
         }
         
-        public static Instruction LdLoca(Variable variable)
+        public static Instruction LdLoca(VariableDefinition definition)
         {
-            if (variable.Definition.VariableType.IsValueType)
-                return Instruction.Create(OpCodes.Ldloca_S, variable.Definition);
+            if (definition.VariableType.IsValueType)
+                return Instruction.Create(OpCodes.Ldloca_S, definition);
             
-            var ldLoc = OpCodeHelper.LdLoc(variable.Index);
-            return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, variable.Definition) : Instruction.Create(ldLoc);
+            var ldLoc = OpCodeHelper.LdLoc(definition.Index);
+            return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, definition) : Instruction.Create(ldLoc);
         }
 
-        public static Instruction StLoc(Variable variable)
+        public static Instruction StLoc(VariableDefinition definition)
         {
-            var stLoc = OpCodeHelper.StLoc(variable.Index);
-            return stLoc.Equals(OpCodes.Stloc_S) ? Instruction.Create(stLoc, variable.Definition) : Instruction.Create(stLoc);
+            var stLoc = OpCodeHelper.StLoc(definition.Index);
+            return stLoc.Equals(OpCodes.Stloc_S) ? Instruction.Create(stLoc, definition) : Instruction.Create(stLoc);
         }
         
         public static Instruction LdElem(TypeReference typeReference)
@@ -53,12 +53,12 @@ namespace LINQ2Method.Helpers
             return ldArg.Equals(OpCodes.Ldarg_S) ? Instruction.Create(ldArg, argIndex) : Instruction.Create(ldArg);
         }
         
-        public static Variable AddVariable(this MethodBody methodBody, TypeReference reference)
+        public static VariableDefinition AddVariable(this MethodBody methodBody, TypeReference reference)
         {
             var index = methodBody.Variables.Count;
             var variable = new VariableDefinition(reference);
             methodBody.Variables.Add(variable);
-            return new Variable(index, variable);
+            return variable;
         }
         
         public static T OperandValue<T>(Instruction instruction)
@@ -82,17 +82,5 @@ namespace LINQ2Method.Helpers
         }
 
         public static void Return(MethodBody methodBody) => methodBody.GetILProcessor().Emit(OpCodes.Ret);
-    }
-
-    public class Variable
-    {
-        public int Index { get; }
-        public VariableDefinition Definition { get; }
-
-        public Variable(int index, VariableDefinition definition)
-        {
-            Index = index;
-            Definition = definition;
-        }
     }
 }
