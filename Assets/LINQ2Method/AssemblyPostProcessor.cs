@@ -69,9 +69,9 @@ namespace LINQ2Method
             forLoop.Start(methodBody);
             forLoop.Local(methodBody, paramType);
             
-            //select.Define(methodBody, selectFuncMethod.Body, forLoop);
             where.Define(methodBody, whereFuncMethod.Body, forLoop, forLoop.LoopEnd);
-
+            select.Define(methodBody, selectFuncMethod.Body, forLoop);
+            
             forLoop.End(methodBody, array.ElementLengthDefinition);
             
             InstructionHelper.Return(methodBody);

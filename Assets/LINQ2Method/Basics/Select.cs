@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using LINQ2Method.Helpers;
 using Mono.Cecil.Cil;
+using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
     public class Select
     {
-        public Instruction Next { get; private set; }
-
         public void Define(MethodBody methodBody, MethodBody funcMethod, For forLoop)
         {
             var processor = methodBody.GetILProcessor();

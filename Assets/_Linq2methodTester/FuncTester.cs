@@ -19,7 +19,7 @@ namespace _Script
          {
              var enumerable = new [] {(2), (41) };
 
-             var s = enumerable.Where(x => x.GetHashCode() < 10).Select(x => x = Random.Range(0,10));
+             var s = enumerable.Where(x => x.GetHashCode() < 10).Select(x => Random.Range(0,10));
              
              Fnc(9, x => x != 10);
              Fnc(new Hoo(2),x => x == new Hoo(3));
@@ -27,15 +27,16 @@ namespace _Script
          
          private void CC(int[] arr)
          {
-             int length = arr.Length;
-             for(var i = 0; i < length; i++)
+             for(var i = 0; i < arr.Length; i++)
              {
                  var loc = arr[i];
 
-                 if(loc.GetHashCode() < 10)
-                     continue;
+                 if (loc.GetHashCode() < 10)
+                 {
+                     
+                 }
 
-                 loc = Random.Range(0, 10);
+                 //loc = Random.Range(0, 10);
              }
          }
 
