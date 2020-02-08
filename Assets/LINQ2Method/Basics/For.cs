@@ -1,7 +1,6 @@
 ﻿using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 namespace LINQ2Method.Basics

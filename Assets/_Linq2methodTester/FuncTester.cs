@@ -33,26 +33,16 @@ namespace _Script
 
                  if (loc.GetHashCode() < 10)
                  {
-                     
+                     loc = Random.Range(0, 10);
                  }
-
-                 //loc = Random.Range(0, 10);
              }
          }
 
          private void Hoo()
          {
-             // ReSharper disable once NotAccessedVariable
-#pragma warning disable 219
-             var su = 0;
-             var sua = 0;
-             var sus = 0;
-             var suf = 0;
-#pragma warning restore 219
-
              for (var i = 0; i < 10; i++)
              {
-                 su += i;
+                 Debug.Break();
              }
          }
      }

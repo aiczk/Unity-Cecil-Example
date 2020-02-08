@@ -1,7 +1,9 @@
-﻿using LINQ2Method.Basics;
+﻿using System.Linq;
+using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using UnityEditor;
+using UnityEngine;
 
 namespace LINQ2Method
 {
@@ -37,20 +39,26 @@ namespace LINQ2Method
             
             var mainTestClassDefinition = mainModule.GetType("_Script", "FuncTester");
 
-/*          foreach (var nestedType in mainTestClassDefinition.NestedTypes)
+            foreach (var nestedType in mainTestClassDefinition.NestedTypes)
             {
                 foreach (var method in nestedType.Methods)
                 {
                     if (method.Name.Equals(".ctor") || method.Name.Equals(".cctor"))
                         continue;
                     
-                    foreach (var instruction in method.Body.Instructions)
-                    {
-                        Debug.Log($"{method.Name} : {instruction}");
-                    }
-                    
+                    Debug.Log(method.ReturnType);
                 }
-            }*/
+            }
+
+            foreach (var typeDefinition in mainModule.Types)
+            {
+                foreach (var method in typeDefinition.Methods)
+                {
+                    if (method.CustomAttributes.Any(x => x.AttributeType.Name.Equals("OptimizationAttribute")))
+                    {
+                    }
+                }
+            }
 
             var typeSystem = mainModule.TypeSystem;
             var methodDefinition = new MethodDefinition("TestMethod", MethodAttributes.Private, typeSystem.Void);

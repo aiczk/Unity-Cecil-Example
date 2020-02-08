@@ -1,7 +1,6 @@
 ﻿using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using UnityEngine;
 
 namespace LINQ2Method.Basics
 {

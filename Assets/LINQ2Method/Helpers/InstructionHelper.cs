@@ -42,11 +42,8 @@ namespace LINQ2Method.Helpers
             return stLoc.Equals(OpCodes.Stloc_S) ? Instruction.Create(stLoc, definition) : Instruction.Create(stLoc);
         }
         
-        public static Instruction LdElem(TypeReference typeReference)
-        {
-            var ldElem = OpCodeHelper.LdElem(typeReference);
-            return Instruction.Create(ldElem);
-        }
+        public static Instruction LdElem(TypeReference typeReference) => 
+            Instruction.Create(OpCodeHelper.LdElem(typeReference));
 
         public static Instruction LdArg(int argIndex)
         {
@@ -56,12 +53,12 @@ namespace LINQ2Method.Helpers
         
         public static VariableDefinition AddVariable(this MethodBody methodBody, TypeReference reference)
         {
-            var index = methodBody.Variables.Count;
             var variable = new VariableDefinition(reference);
             methodBody.Variables.Add(variable);
             return variable;
         }
         
+        // ReSharper disable once ReturnTypeCanBeEnumerable.Global
         public static Instruction[] FuncConvert(MethodBody funcMethod, For forLoop)
         {
             var size = funcMethod.Instructions.Count - 1;
@@ -76,7 +73,7 @@ namespace LINQ2Method.Helpers
 
                 if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
                 {
-                    res = InstructionHelper.LdLoca(forLoop.LocalDefinition);
+                    res = LdLoca(forLoop.LocalDefinition);
                     continue;
                 }
                 

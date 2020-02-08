@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using LINQ2Method.Helpers;
+﻿using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
-using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
