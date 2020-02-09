@@ -4,7 +4,7 @@ using Mono.Cecil.Cil;
 
 namespace LINQ2Method.Basics
 {
-    public class Where
+    public class Where : ILinqOperator
     {
         private For forLoop;
         private TypeSystem typeSystem;
@@ -21,6 +21,7 @@ namespace LINQ2Method.Basics
             converted = InstructionHelper.FuncConvert(funcMethod, forLoop);
             return converted[0];
         }
+        
         public void Define(MethodBody methodBody, MethodBody funcMethod, Instruction nextProcess)
         {
             var checkVariable = methodBody.AddVariable(typeSystem.Boolean);

@@ -5,28 +5,44 @@ using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
-    public class Select
+    public class Select : ILinqOperator
     {
         private For forLoop;
+        private Instruction ldLoca;
+        private Instruction[] converted;
         
         public Select(For forLoop)
         {
             this.forLoop = forLoop;
         }
 
+        public Instruction Next(MethodBody funcMethod)
+        {
+            var returnType = funcMethod.Method.ReturnType;
+            if (returnType.Name != forLoop.LocalDefinition.VariableType.Name)
+            {
+                ldLoca = InstructionHelper.LdLoca(forLoop.LocalDefinition);
+                return ldLoca;
+            }
+            
+            converted = Convert(funcMethod);
+            return converted[0];
+        }
+
         public void Define(MethodBody methodBody, MethodBody funcMethod)
         {
             var processor = methodBody.GetILProcessor();
-
-            var returnType = funcMethod.Method.ReturnType;
             
-            if (!returnType.Name.Equals(forLoop.LocalDefinition.VariableType.Name))
+            if (ldLoca != null)
             {
-                processor.Append(InstructionHelper.LdLoca(forLoop.LocalDefinition));
-                forLoop.LocalDefinition = methodBody.AddVariable(returnType);
+                processor.Append(ldLoca);
+                forLoop.LocalDefinition = methodBody.AddVariable(funcMethod.Method.ReturnType);
             }
+            
+            if (converted == null)
+                converted = Convert(funcMethod);
 
-            foreach (var instruction in Convert(funcMethod))
+            foreach (var instruction in converted)
             {
                 if(instruction == null)
                     continue;
@@ -43,7 +59,6 @@ namespace LINQ2Method.Basics
             var result = new Instruction[size];
             var instructions = funcMethod.Instructions;
             
-
             for (var i = 0; i < size; i++)
             {
                 ref var res = ref result[i];

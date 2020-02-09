@@ -19,41 +19,29 @@ namespace _Script
          {
              var enumerable = new [] {new Hoo(2), new Hoo(41) };
 
-             var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index != 114514);
+             var s = enumerable.Where(x => x.Index % 2 != 0).Where(x => x.Index > 114514).Select(x => x.Index);
              
              //Fnc(9, x => x != 10);
              //Fnc(new Hoo(2),x => x == new Hoo(3));
          }
 
-         private void F()
+         private void CC(int[] arr)
          {
-             for (var i = 0; i < 100; i++)
-             {
-                 
-             }
-         }
-         
-         private void CC(Hoo[] arr)
-         {
-             var s = arr.Length;
-             for(var i = 0; i < s; i++)
+             int length = arr.Length;
+             for(var i = 0; i < arr.Length; i++)
              {
                  var loc = arr[i];
-                 int loca = default;
-                 if (loc.GetHashCode() < 10)
-                 {
-                     var fa = loc.Index;
-                     fa = loca;
-                 }
+                 
+                 if(loc % 2 != 0)
+                     continue;
+                 
+                 if(loc > 10)
+                     continue;
+                 
+                 Debug.Log("H");
+                 //do
              }
-         }
 
-         private void Hoo()
-         {
-             for (var i = 0; i < 10; i++)
-             {
-                 Debug.Break();
-             }
          }
      }
 

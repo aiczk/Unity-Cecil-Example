@@ -1,5 +1,12 @@
-﻿namespace LINQ2Method.Basics
+﻿using Mono.Cecil.Cil;
+
+namespace LINQ2Method.Basics
 {
+    public interface ILinqOperator
+    {
+        Instruction Next(MethodBody func);
+    }
+    
     public enum LinqOperators
     {
         Where,
