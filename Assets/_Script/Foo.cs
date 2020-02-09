@@ -1,5 +1,9 @@
-﻿using Mono_Cecil_Sample.Attributes;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using Mono_Cecil_Sample.Attributes;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace _Script
 {
@@ -10,7 +14,6 @@ namespace _Script
         {
             
         }
-
         [Profile]
         private void Update()
         {

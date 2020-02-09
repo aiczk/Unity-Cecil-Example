@@ -10,7 +10,7 @@ namespace LINQ2Method.Basics
         public Instruction LoopEnd { get; }
         public Instruction IncrementIndex { get; private set; }
         public VariableDefinition IndexDefinition { get; private set; }
-        public VariableDefinition LocalDefinition { get; private set; }
+        public VariableDefinition LocalDefinition { get; set; }
         
         private Instruction loopStart;
         private Instruction loopCheck;

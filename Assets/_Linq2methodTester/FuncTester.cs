@@ -17,23 +17,33 @@ namespace _Script
          [Optimization]
          private void Foo()
          {
-             var enumerable = new [] {(2), (41) };
+             var enumerable = new [] {new Hoo(2), new Hoo(41) };
 
-             var s = enumerable.Where(x => x.GetHashCode() < 10).Select(x => Random.Range(0,10));
+             var s = enumerable.Where(x => x.Index % 2 == 0).Select(x => x.Index);
              
-             Fnc(9, x => x != 10);
-             Fnc(new Hoo(2),x => x == new Hoo(3));
+             //Fnc(9, x => x != 10);
+             //Fnc(new Hoo(2),x => x == new Hoo(3));
+         }
+
+         private void F()
+         {
+             for (var i = 0; i < 100; i++)
+             {
+                 
+             }
          }
          
-         private void CC(int[] arr)
+         private void CC(Hoo[] arr)
          {
-             for(var i = 0; i < arr.Length; i++)
+             var s = arr.Length;
+             for(var i = 0; i < s; i++)
              {
                  var loc = arr[i];
-
+                 int loca = default;
                  if (loc.GetHashCode() < 10)
                  {
-                     loc = Random.Range(0, 10);
+                     var fa = loc.Index;
+                     fa = loca;
                  }
              }
          }
@@ -49,16 +59,16 @@ namespace _Script
 
      public class Hoo : IEquatable<Hoo>
      {
-         public int rdm;
+         public int Index;
 
-         public Hoo(int rdm)
+         public Hoo(int index)
          {
-             this.rdm = rdm;
+             this.Index = index;
          }
 
          public bool Equals(Hoo other)
          {
-             return other != null && other.rdm == rdm;
+             return other != null && other.Index == Index;
          }
 
          public override bool Equals(object obj)

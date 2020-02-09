@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text.RegularExpressions;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
@@ -45,18 +46,23 @@ namespace LINQ2Method
                 {
                     if (method.Name.Equals(".ctor") || method.Name.Equals(".cctor"))
                         continue;
-                    
-                    Debug.Log(method.ReturnType);
+
                 }
             }
 
             foreach (var typeDefinition in mainModule.Types)
             {
+                if(!typeDefinition.IsClass)
+                    continue;
+                
                 foreach (var method in typeDefinition.Methods)
                 {
-                    if (method.CustomAttributes.Any(x => x.AttributeType.Name.Equals("OptimizationAttribute")))
-                    {
-                    }
+                    if (!method.CustomAttributes.Any(x => x.AttributeType.Name.Equals("OptimizationAttribute")))
+                        continue;
+
+                    var body = method.Body;
+                    var localVariable = body.Variables;
+                    var instructions = body.Instructions;
                 }
             }
 
@@ -65,7 +71,7 @@ namespace LINQ2Method
             mainTestClassDefinition.Methods.Add(methodDefinition);
             
             var forLoop = new For(typeSystem);
-            var array = new Array(typeSystem);
+            var arg = new Arg(typeSystem);
             var where = new Where(typeSystem);
             var select = new Select();
             var methodBody = methodDefinition.Body;
@@ -73,14 +79,14 @@ namespace LINQ2Method
             var selectFuncMethod = mainTestClassDefinition.NestedTypes[0].Methods[3];
             var paramType = whereFuncMethod.Parameters[0].ParameterType;
             
-            array.Define(methodBody, paramType);
+            arg.Define(methodBody, paramType);
             forLoop.Start(methodBody);
             forLoop.Local(methodBody, paramType);
             
             where.Define(methodBody, whereFuncMethod.Body, forLoop, forLoop.LoopEnd);
             select.Define(methodBody, selectFuncMethod.Body, forLoop);
             
-            forLoop.End(methodBody, array.ElementLengthDefinition);
+            forLoop.End(methodBody, arg.ElementLengthDefinition);
             
             InstructionHelper.Return(methodBody);
             mainModule.Write("Test.dll");

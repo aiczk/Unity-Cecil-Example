@@ -4,13 +4,13 @@ using Mono.Cecil.Cil;
 
 namespace LINQ2Method.Basics
 {
-    public class Array
+    public class Arg
     {
         public VariableDefinition ElementLengthDefinition { get; private set; }
         
         private TypeSystem typeSystem;
 
-        public Array(TypeSystem typeSystem)
+        public Arg(TypeSystem typeSystem)
         {
             this.typeSystem = typeSystem;
         }
