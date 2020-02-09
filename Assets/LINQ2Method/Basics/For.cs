@@ -42,7 +42,7 @@ namespace LINQ2Method.Basics
             processor.Append(loopStart);
         }
         
-        public void End(MethodBody methodBody, VariableDefinition arrayLengthDefinition)
+        public void End(MethodBody methodBody)
         {
             var withInVariable = methodBody.AddVariable(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
@@ -55,10 +55,15 @@ namespace LINQ2Method.Basics
             processor.Emit(OpCodes.Ldc_I4_1);
             processor.Emit(OpCodes.Add);
             processor.Append(InstructionHelper.StLoc(IndexDefinition));
-
-            //i < n
+            
+            //i < arr.Length
             processor.Append(loopCheck);
-            processor.Append(InstructionHelper.LdLoc(arrayLengthDefinition));
+            
+            //arr.Length
+            processor.Append(InstructionHelper.LdArg(1));
+            processor.Emit(OpCodes.Ldlen);
+            processor.Emit(OpCodes.Conv_I4);
+            
             processor.Emit(OpCodes.Clt);
             processor.Append(InstructionHelper.StLoc(withInVariable));
             
@@ -67,7 +72,7 @@ namespace LINQ2Method.Basics
             processor.Emit(OpCodes.Brtrue_S, loopStart);
         }
 
-        public void Local(MethodBody methodBody, TypeReference argType)
+        public void CreateLocal(MethodBody methodBody, TypeReference argType)
         { 
             LocalDefinition = methodBody.AddVariable(argType);
             var processor = methodBody.GetILProcessor();

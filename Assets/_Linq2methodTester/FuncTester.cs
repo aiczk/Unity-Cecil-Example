@@ -19,7 +19,7 @@ namespace _Script
          {
              var enumerable = new [] {new Hoo(2), new Hoo(41) };
 
-             var s = enumerable.Where(x => x.Index % 2 == 0).Select(x => x.Index);
+             var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index != 114514);
              
              //Fnc(9, x => x != 10);
              //Fnc(new Hoo(2),x => x == new Hoo(3));

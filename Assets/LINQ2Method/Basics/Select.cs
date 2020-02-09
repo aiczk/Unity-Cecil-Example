@@ -7,7 +7,14 @@ namespace LINQ2Method.Basics
 {
     public class Select
     {
-        public void Define(MethodBody methodBody, MethodBody funcMethod, For forLoop)
+        private For forLoop;
+        
+        public Select(For forLoop)
+        {
+            this.forLoop = forLoop;
+        }
+
+        public void Define(MethodBody methodBody, MethodBody funcMethod)
         {
             var processor = methodBody.GetILProcessor();
 

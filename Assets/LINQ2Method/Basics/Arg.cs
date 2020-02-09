@@ -6,8 +6,6 @@ namespace LINQ2Method.Basics
 {
     public class Arg
     {
-        public VariableDefinition ElementLengthDefinition { get; private set; }
-        
         private TypeSystem typeSystem;
 
         public Arg(TypeSystem typeSystem)
@@ -18,14 +16,7 @@ namespace LINQ2Method.Basics
         public void Define(MethodBody methodBody, TypeReference arrayType)
         {
             methodBody.Method.Parameters.Add(new ParameterDefinition(new ArrayType(arrayType)));
-            ElementLengthDefinition = methodBody.AddVariable(typeSystem.Int32);
-
-            var processor = methodBody.GetILProcessor();
-            
-            processor.Append(InstructionHelper.LdArg(1));
-            processor.Emit(OpCodes.Ldlen);
-            processor.Emit(OpCodes.Conv_I4);
-            processor.Append(InstructionHelper.StLoc(ElementLengthDefinition));
+            methodBody.AddVariable(typeSystem.Int32);
         }
     }
 }

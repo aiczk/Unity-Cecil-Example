@@ -1,27 +1,42 @@
-﻿using Mono.Cecil;
+﻿using LINQ2Method.Helpers;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace LINQ2Method.Basics
 {
     public class Method
     {
-        private TypeSystem typeSystem;
+        private TypeDefinition classDefinition;
+        private MethodDefinition methodDefinition;
+        private MethodBody methodBody;
         private For forLoop;
         private Arg arg;
 
-        public Method(TypeSystem typeSystem)
+        public Method(TypeSystem typeSystem, TypeDefinition classDefinition)
         {
-            this.typeSystem = typeSystem;
+            this.classDefinition = classDefinition;
             forLoop = new For(typeSystem);
             arg = new Arg(typeSystem);
         }
 
-        public MethodDefinition Create(string methodName, TypeReference returnType)
+        public void Create(string methodName, TypeReference returnType)
         {
-            return new MethodDefinition(methodName, MethodAttributes.Private, returnType);
+            methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
+            classDefinition.Methods.Add(methodDefinition);
+            methodBody = methodDefinition.Body;
         }
 
-        public void ForStart(MethodBody methodBody) => forLoop.Start(methodBody);
-        public void ForEnd(MethodBody methodBody) => forLoop.End(methodBody, arg.ElementLengthDefinition);
+        public void Start(TypeReference argType)
+        {
+            arg.Define(methodBody, argType);
+            forLoop.Start(methodBody);
+            forLoop.CreateLocal(methodBody, argType);
+        }
+
+        public void End()
+        {
+            forLoop.End(methodBody);
+            InstructionHelper.Return(methodBody);
+        }
     }
 }

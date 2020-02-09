@@ -10,13 +10,13 @@ namespace LINQ2Method.Helpers
 {
     public static class InstructionHelper
     {
-        public static Instruction LdcI4(int loopCount)
+        public static Instruction LdcI4(int value)
         {
-            var ldcI4 = OpCodeHelper.LdcI4(loopCount);
+            var ldcI4 = OpCodeHelper.LdcI4(value);
             return ldcI4.Code switch
             {
-                Code.Ldc_I4_S => Instruction.Create(ldcI4, (sbyte) loopCount),
-                Code.Ldc_I4 => Instruction.Create(ldcI4, loopCount),
+                Code.Ldc_I4_S => Instruction.Create(ldcI4, (sbyte) value),
+                Code.Ldc_I4 => Instruction.Create(ldcI4, value),
                 _ => Instruction.Create(ldcI4)
             };
         }
