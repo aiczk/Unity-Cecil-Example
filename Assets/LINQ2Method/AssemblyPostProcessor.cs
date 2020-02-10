@@ -49,6 +49,7 @@ namespace LINQ2Method
 //                    
 //                }
 //            }
+/*
             foreach (var typeDefinition in mainModule.Types)
             {
                 if(!typeDefinition.IsClass)
@@ -67,34 +68,28 @@ namespace LINQ2Method
                     }
                 }
             }
+*/
 
             var typeSystem = mainModule.TypeSystem;
-            var methodDefinition = new MethodDefinition("TestMethod", MethodAttributes.Private, typeSystem.Void);
-            mainTestClassDefinition.Methods.Add(methodDefinition);
-            
-            var forLoop = new For(typeSystem);
-            var arg = new Arg(typeSystem);
-            var where = new Where(typeSystem, forLoop);
-            var where2 = new Where(typeSystem, forLoop);
-            var select = new Select(forLoop);
+            var method = new Method(typeSystem, mainTestClassDefinition);
+            var where = new Where(typeSystem, method.ForLoop);
+            var where2 = new Where(typeSystem, method.ForLoop);
+            var select = new Select(method.ForLoop);
             var nestedType = mainTestClassDefinition.NestedTypes[0];
             var whereFunc = nestedType.Methods[2];
             var where2Func = nestedType.Methods[3];
             var selectFunc = nestedType.Methods[4];
-            var paramType = whereFunc.Parameters[0].ParameterType;
-            var methodBody = methodDefinition.Body;
+            var argType = whereFunc.Parameters[0].ParameterType;
+
+            method.Create("TestMethod", argType, typeSystem.Void);
+            method.Start();
             
-            arg.Define(methodBody, paramType);
-            forLoop.Start(methodBody);
-            forLoop.CreateLocal(methodBody, paramType);
+            where.Define(method.Body, whereFunc.Body, where2.Next(where2Func.Body));
+            where2.Define(method.Body, where2Func.Body, select.Next(selectFunc.Body));
+            select.Define(method.Body, selectFunc.Body);
             
-            where.Define(methodBody, whereFunc.Body, where2.Next(where2Func.Body));
-            where2.Define(methodBody, where2Func.Body, select.Next(selectFunc.Body));
-            select.Define(methodBody, selectFunc.Body);
+            method.End();
             
-            forLoop.End(methodBody);
-            
-            InstructionHelper.Return(methodBody);
             mainModule.Write("Test.dll");
         }
     }

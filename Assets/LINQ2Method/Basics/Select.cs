@@ -29,14 +29,14 @@ namespace LINQ2Method.Basics
             return converted[0];
         }
 
-        public void Define(MethodBody methodBody, MethodBody funcMethod)
+        public void Define(MethodBody method, MethodBody funcMethod)
         {
-            var processor = methodBody.GetILProcessor();
+            var processor = method.GetILProcessor();
             
             if (ldLoca != null)
             {
                 processor.Append(ldLoca);
-                forLoop.LocalDefinition = methodBody.AddVariable(funcMethod.Method.ReturnType);
+                forLoop.LocalDefinition = method.AddVariable(funcMethod.Method.ReturnType);
             }
             
             if (converted == null)

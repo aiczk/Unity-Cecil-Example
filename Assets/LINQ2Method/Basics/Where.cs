@@ -22,10 +22,10 @@ namespace LINQ2Method.Basics
             return converted[0];
         }
         
-        public void Define(MethodBody methodBody, MethodBody funcMethod, Instruction nextProcess)
+        public void Define(MethodBody method, MethodBody funcMethod, Instruction nextProcess)
         {
-            var checkVariable = methodBody.AddVariable(typeSystem.Boolean);
-            var processor = methodBody.GetILProcessor();
+            var checkVariable = method.AddVariable(typeSystem.Boolean);
+            var processor = method.GetILProcessor();
 
             if (converted == null)
                 converted = InstructionHelper.FuncConvert(funcMethod, forLoop);
@@ -40,9 +40,7 @@ namespace LINQ2Method.Basics
             
             //true
             processor.Emit(OpCodes.Brfalse_S, nextProcess);
-            //processor.Emit(OpCodes.Brfalse_S, forLoop.LoopEnd);
-            
-            //false continue
+            //continue
             processor.Emit(OpCodes.Br_S, forLoop.IncrementIndex);
         }
     }

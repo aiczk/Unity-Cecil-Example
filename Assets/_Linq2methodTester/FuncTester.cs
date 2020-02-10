@@ -9,20 +9,12 @@ namespace _Script
  {
      public class FuncTester
      {
-         public void Fnc<T>(T value,Func<T, bool> func)
-         {
-             func(value);
-         }
- 
          [Optimization]
          private void Foo()
          {
              var enumerable = new [] {new Hoo(2), new Hoo(41) };
 
-             var s = enumerable.Where(x => x.Index % 2 != 0).Where(x => x.Index > 114514).Select(x => x.Index);
-             
-             //Fnc(9, x => x != 10);
-             //Fnc(new Hoo(2),x => x == new Hoo(3));
+             var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index > 114514).Select(x => x.Index);
          }
 
          private void CC(int[] arr)

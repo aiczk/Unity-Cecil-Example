@@ -6,37 +6,44 @@ namespace LINQ2Method.Basics
 {
     public class Method
     {
+        public For ForLoop { get; }
+        public MethodBody Body { get; private set; }
+
+        private TypeSystem typeSystem;
+        private TypeReference paramType;
         private TypeDefinition classDefinition;
         private MethodDefinition methodDefinition;
-        private MethodBody methodBody;
-        private For forLoop;
         private Arg arg;
 
         public Method(TypeSystem typeSystem, TypeDefinition classDefinition)
         {
+            this.typeSystem = typeSystem;
             this.classDefinition = classDefinition;
-            forLoop = new For(typeSystem);
-            arg = new Arg(typeSystem);
+            ForLoop = new For(typeSystem);
+            arg = new Arg();
         }
 
-        public void Create(string methodName, TypeReference returnType)
+        public void Create(string methodName, TypeReference argType, TypeReference returnType)
         {
             methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
             classDefinition.Methods.Add(methodDefinition);
-            methodBody = methodDefinition.Body;
+            Body = methodDefinition.Body;
+            paramType = argType;
         }
 
-        public void Start(TypeReference argType)
+        public void Start()
         {
-            arg.Define(methodBody, argType);
-            forLoop.Start(methodBody);
-            forLoop.CreateLocal(methodBody, argType);
+            arg.Define(Body, paramType);
+            ForLoop.Start(Body);
+            ForLoop.CreateLocal(Body, paramType);
         }
 
         public void End()
         {
-            forLoop.End(methodBody);
-            InstructionHelper.Return(methodBody);
+            ForLoop.End(Body);
+            
+            //todo return value
+            InstructionHelper.Return(Body);
         }
     }
 }

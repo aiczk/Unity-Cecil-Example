@@ -28,33 +28,26 @@ public class Perform : MonoBehaviour
     
     private void FSA()
     {
-        var array = new Foo[1000000];
-
-        for (var i = 0; i < 1000000; i++)
-        {
-            array[i] = new Foo(i);
-        }
-
+        const int million = 1000000;
+        var array = new Foo[million];
+        
         var stopWatch = new Stopwatch();
-
         stopWatch.Start();
-        for (var i = 0; i < 1000000; i++)
+        for (var i = 0; i < million; i++)
         {
-            var s = array.Where(x => x.Index % 2 == 0).Select(x => x.Index);
+            _ = array.Where(x => x.Index % 2 == 0).Select(x => x.Index);
         }
         stopWatch.Stop();
         Debug.Log($"LINQ :{stopWatch.ElapsedMilliseconds.ToString()}");
             
-        stopWatch.Reset();
-        stopWatch.Start();
-        for (var i = 0; i < 1000000; i++)
+        stopWatch.Restart();
+        for (var i = 0; i < million; i++)
         {
-            ref var s = ref array[i];
+            var s = array[i];
 
             if (s.Index % 2 == 0)
             {
-                var ind = s.Index;
-                _ = ind;
+                _ = s.Index;
             }
         }
         stopWatch.Stop();

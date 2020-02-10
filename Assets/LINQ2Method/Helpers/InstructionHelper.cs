@@ -32,6 +32,7 @@ namespace LINQ2Method.Helpers
             if (definition.VariableType.IsValueType)
                 return Instruction.Create(OpCodes.Ldloca_S, definition);
             
+            
             var ldLoc = OpCodeHelper.LdLoc(definition.Index);
             return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, definition) : Instruction.Create(ldLoc);
         }
@@ -83,27 +84,6 @@ namespace LINQ2Method.Helpers
                 res = instruction;
             }
             
-            return result;
-
-        }
-        
-        public static T OperandValue<T>(Instruction instruction)
-        where T : struct
-        {
-            T result;
-
-            try
-            {
-                result = (T) instruction.Operand;
-            }
-            catch (InvalidCastException e)
-            {
-                if (e.Source != null)
-                    Debug.LogError($"Cast Error! :{e.Source}");
-                
-                throw;
-            }
-
             return result;
         }
 
