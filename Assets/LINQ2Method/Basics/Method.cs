@@ -11,35 +11,34 @@ namespace LINQ2Method.Basics
         public For ForLoop { get; }
         public MethodBody Body { get; private set; }
 
-        private Queue<(Operator, ILinqOperator)> operators;
-        private TypeSystem typeSystem;
-        private TypeReference paramType;
+        private Queue<ILinqOperator> operators;
+        private TypeReference argType;
         private TypeDefinition classDefinition;
         private MethodDefinition methodDefinition;
         private Arg arg;
 
         public Method(TypeSystem typeSystem, TypeDefinition classDefinition)
         {
-            this.typeSystem = typeSystem;
             this.classDefinition = classDefinition;
-            operators = new Queue<(Operator, ILinqOperator)>();
+            operators = new Queue<ILinqOperator>();
             ForLoop = new For(typeSystem);
             arg = new Arg();
         }
 
-        public void Create(string methodName, TypeReference argType, TypeReference returnType)
+        public void Create(string methodName, TypeReference argsType, TypeReference returnType)
         {
             methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
             classDefinition.Methods.Add(methodDefinition);
+            arg.Define(methodDefinition.Body, argsType);
+            
             Body = methodDefinition.Body;
-            paramType = argType;
+            argType = argsType;
         }
 
-        public void Start()
+        public void Begin()
         {
-            arg.Define(Body, paramType);
             ForLoop.Start(Body);
-            ForLoop.CreateLocal(Body, paramType);
+            ForLoop.DefineLocal(Body, argType);
         }
 
         public void End()
@@ -50,22 +49,20 @@ namespace LINQ2Method.Basics
             InstructionHelper.Return(Body);
         }
 
-        public void AddOperator(Operator linq, ILinqOperator linqOperator)
-        {
-            operators.Enqueue((linq, linqOperator));
-        }
+        public void AddOperator(ILinqOperator linqOperator) => operators.Enqueue(linqOperator);
 
         public void Build()
         {
             var loop = operators.Count;
             for (var i = 0; i < loop; i++)
             {
-                var (linq, linqOperator) = operators.Dequeue();
-
-                if (linq == Operator.Where)
+                var linqOperator = operators.Dequeue();
+                
+                if ((linqOperator as Where) != null)
                 {
-                    var peek = operators.Peek();
-                    linqOperator.Define(Body, peek.Item2.Next());
+                    var nextOperator = operators.Peek();
+                    var nextProcess = nextOperator == null ? ForLoop.IncrementIndex : nextOperator.Next();
+                    linqOperator.Define(Body, nextProcess);
                     continue;
                 }
 

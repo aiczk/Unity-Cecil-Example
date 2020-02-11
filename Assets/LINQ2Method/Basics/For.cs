@@ -72,7 +72,7 @@ namespace LINQ2Method.Basics
             processor.Emit(OpCodes.Brtrue_S, loopStart);
         }
 
-        public void CreateLocal(MethodBody methodBody, TypeReference argType)
+        public void DefineLocal(MethodBody methodBody, TypeReference argType)
         { 
             LocalDefinition = methodBody.AddVariable(argType);
             var processor = methodBody.GetILProcessor();

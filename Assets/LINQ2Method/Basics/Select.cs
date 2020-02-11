@@ -76,7 +76,7 @@ namespace LINQ2Method.Basics
 
                 if (opCode == OpCodes.Ret)
                     continue;
-
+                
                 res = instruction;
             }
             

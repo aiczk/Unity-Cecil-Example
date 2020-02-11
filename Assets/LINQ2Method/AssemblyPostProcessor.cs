@@ -17,7 +17,6 @@ namespace LINQ2Method
                 return;
             
             PostCompile();
-            
         }
 
         private static void PostCompile()
@@ -40,16 +39,16 @@ namespace LINQ2Method
             var mainModule = mainAssembly.MainModule;
             var mainTestClassDefinition = mainModule.GetType("_Script", "FuncTester");
 
-//            foreach (var nestedType in mainTestClassDefinition.NestedTypes)
-//            {
-//                foreach (var method in nestedType.Methods)
-//                {
-//                    if (method.Name.Equals(".ctor") || method.Name.Equals(".cctor"))
-//                        continue;
-//                    
-//                }
-//            }
-/*
+/*            foreach (var nestedType in mainTestClassDefinition.NestedTypes)
+            {
+                foreach (var method in nestedType.Methods)
+                {
+                    if (method.Name.Equals(".ctor") || method.Name.Equals(".cctor"))
+                        continue;
+                    
+                }
+            }
+
             foreach (var typeDefinition in mainModule.Types)
             {
                 if(!typeDefinition.IsClass)
@@ -82,18 +81,13 @@ namespace LINQ2Method
             var select = new Select(selectFunc, method.ForLoop);
 
             method.Create("TestMethod", argType, typeSystem.Void);
-            method.Start();
+            method.Begin();
 
-            method.AddOperator(Operator.Where, where);
-            method.AddOperator(Operator.Where, where2);
-            method.AddOperator(Operator.Select, select);
+            method.AddOperator(where);
+            method.AddOperator(where2);
+            method.AddOperator(select);
             
             method.Build();
-            
-//            where.Define(method.Body, where2.Next());
-//            where2.Define(method.Body, select.Next());
-//            select.Define(method.Body);
-            
             method.End();
             
             mainModule.Write("Test.dll");
