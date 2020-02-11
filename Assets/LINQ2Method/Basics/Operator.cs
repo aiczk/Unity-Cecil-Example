@@ -4,10 +4,11 @@ namespace LINQ2Method.Basics
 {
     public interface ILinqOperator
     {
-        Instruction Next(MethodBody func);
+        void Define(MethodBody method, Instruction jumpInstruction);
+        Instruction Next();
     }
     
-    public enum LinqOperators
+    public enum Operator
     {
         Where,
         Select,

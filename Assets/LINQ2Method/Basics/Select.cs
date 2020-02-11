@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using LINQ2Method.Helpers;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 
@@ -7,16 +8,18 @@ namespace LINQ2Method.Basics
 {
     public class Select : ILinqOperator
     {
+        private MethodBody funcMethod;
         private For forLoop;
         private Instruction ldLoca;
         private Instruction[] converted;
         
-        public Select(For forLoop)
+        public Select(MethodDefinition funcMethod, For forLoop)
         {
+            this.funcMethod = funcMethod.Body;
             this.forLoop = forLoop;
         }
 
-        public Instruction Next(MethodBody funcMethod)
+        public Instruction Next()
         {
             var returnType = funcMethod.Method.ReturnType;
             if (returnType.Name != forLoop.LocalDefinition.VariableType.Name)
@@ -28,17 +31,20 @@ namespace LINQ2Method.Basics
             converted = Convert(funcMethod);
             return converted[0];
         }
-
-        public void Define(MethodBody method, MethodBody funcMethod)
+        
+        public void Define(MethodBody method, Instruction jumpInstruction = null)
         {
             var processor = method.GetILProcessor();
             
-            if (ldLoca != null)
+            if (funcMethod.Method.ReturnType.Name != forLoop.LocalDefinition.VariableType.Name)
             {
+                if (ldLoca == null)
+                    ldLoca = InstructionHelper.LdLoca(forLoop.LocalDefinition);
+                
                 processor.Append(ldLoca);
                 forLoop.LocalDefinition = method.AddVariable(funcMethod.Method.ReturnType);
             }
-            
+
             if (converted == null)
                 converted = Convert(funcMethod);
 

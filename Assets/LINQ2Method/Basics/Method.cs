@@ -1,6 +1,8 @@
-﻿using LINQ2Method.Helpers;
+﻿using System.Collections.Generic;
+using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
@@ -9,6 +11,7 @@ namespace LINQ2Method.Basics
         public For ForLoop { get; }
         public MethodBody Body { get; private set; }
 
+        private Queue<(Operator, ILinqOperator)> operators;
         private TypeSystem typeSystem;
         private TypeReference paramType;
         private TypeDefinition classDefinition;
@@ -19,6 +22,7 @@ namespace LINQ2Method.Basics
         {
             this.typeSystem = typeSystem;
             this.classDefinition = classDefinition;
+            operators = new Queue<(Operator, ILinqOperator)>();
             ForLoop = new For(typeSystem);
             arg = new Arg();
         }
@@ -44,6 +48,29 @@ namespace LINQ2Method.Basics
             
             //todo return value
             InstructionHelper.Return(Body);
+        }
+
+        public void AddOperator(Operator linq, ILinqOperator linqOperator)
+        {
+            operators.Enqueue((linq, linqOperator));
+        }
+
+        public void Build()
+        {
+            var loop = operators.Count;
+            for (var i = 0; i < loop; i++)
+            {
+                var (linq, linqOperator) = operators.Dequeue();
+
+                if (linq == Operator.Where)
+                {
+                    var peek = operators.Peek();
+                    linqOperator.Define(Body, peek.Item2.Next());
+                    continue;
+                }
+
+                linqOperator.Define(Body, null);
+            }
         }
     }
 }
