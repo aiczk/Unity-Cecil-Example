@@ -71,23 +71,20 @@ namespace LINQ2Method
 
             var typeSystem = mainModule.TypeSystem;
             var nestedType = mainTestClassDefinition.NestedTypes[0];
-            var whereFunc = nestedType.Methods[2];
-            var where2Func = nestedType.Methods[3];
-            var selectFunc = nestedType.Methods[4];
-            var argType = whereFunc.Parameters[0].ParameterType;
+            var argType = nestedType.Methods[2].Parameters[0].ParameterType;
             var method = new Method(typeSystem, mainTestClassDefinition);
-            var where = new Where(typeSystem, whereFunc, method.ForLoop);
-            var where2 = new Where(typeSystem, selectFunc, method.ForLoop);
-            var select = new Select(where2Func, method.ForLoop);
+            var where = new Where(typeSystem, nestedType.Methods[2], method.ForLoop);
+            var where2 = new Where(typeSystem, nestedType.Methods[3], method.ForLoop);
+            var select = new Select(nestedType.Methods[4], method.ForLoop);
 
             var returnType = typeSystem.Void;
             method.Create("TestMethod", argType, returnType);
             method.Begin();
 
             method.AddOperator(where);
-            method.AddOperator(select);
             method.AddOperator(where2);
-            
+            method.AddOperator(select);
+
             method.Build();
             method.End();
             

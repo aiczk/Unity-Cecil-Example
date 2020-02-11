@@ -38,16 +38,14 @@ namespace LINQ2Method.Basics
             
             if (funcMethod.Method.ReturnType.Name != forLoop.LocalDefinition.VariableType.Name)
             {
-                if (ldLoca == null)
-                    ldLoca = InstructionHelper.LdLoca(forLoop.LocalDefinition);
+                ldLoca ??= InstructionHelper.LdLoca(forLoop.LocalDefinition);
                 
                 processor.Append(ldLoca);
                 forLoop.LocalDefinition = method.AddVariable(funcMethod.Method.ReturnType);
             }
 
-            if (converted == null)
-                converted = Convert(funcMethod);
-
+            converted ??= Convert(funcMethod);
+            
             foreach (var instruction in converted)
             {
                 if(instruction == null)
