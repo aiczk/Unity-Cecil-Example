@@ -77,15 +77,16 @@ namespace LINQ2Method
             var argType = whereFunc.Parameters[0].ParameterType;
             var method = new Method(typeSystem, mainTestClassDefinition);
             var where = new Where(typeSystem, whereFunc, method.ForLoop);
-            var where2 = new Where(typeSystem, where2Func, method.ForLoop);
-            var select = new Select(selectFunc, method.ForLoop);
+            var where2 = new Where(typeSystem, selectFunc, method.ForLoop);
+            var select = new Select(where2Func, method.ForLoop);
 
-            method.Create("TestMethod", argType, typeSystem.Void);
+            var returnType = typeSystem.Void;
+            method.Create("TestMethod", argType, returnType);
             method.Begin();
 
             method.AddOperator(where);
-            method.AddOperator(where2);
             method.AddOperator(select);
+            method.AddOperator(where2);
             
             method.Build();
             method.End();

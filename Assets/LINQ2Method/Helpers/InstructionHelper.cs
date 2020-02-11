@@ -74,7 +74,7 @@ namespace LINQ2Method.Helpers
 
                 if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
                 {
-                    res = LdLoca(forLoop.LocalDefinition);
+                    res = LdLoc(forLoop.LocalDefinition);
                     continue;
                 }
                 

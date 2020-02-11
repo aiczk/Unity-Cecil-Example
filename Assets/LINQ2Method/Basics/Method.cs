@@ -44,7 +44,6 @@ namespace LINQ2Method.Basics
         public void End()
         {
             ForLoop.End(Body);
-            
             //todo return value
             InstructionHelper.Return(Body);
         }
@@ -60,12 +59,15 @@ namespace LINQ2Method.Basics
                 
                 if ((linqOperator as Where) != null)
                 {
-                    var nextOperator = operators.Peek();
+                    ILinqOperator nextOperator = null;
+                    if (operators.Count != 0) 
+                        nextOperator = operators.Peek();
+                    
                     var nextProcess = nextOperator == null ? ForLoop.IncrementIndex : nextOperator.Next();
                     linqOperator.Define(Body, nextProcess);
                     continue;
                 }
-
+                
                 linqOperator.Define(Body, null);
             }
         }

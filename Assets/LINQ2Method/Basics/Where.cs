@@ -18,13 +18,13 @@ namespace LINQ2Method.Basics
             this.forLoop = forLoop;
         }
 
-        public Instruction Next()
+        Instruction ILinqOperator.Next()
         {
             converted = InstructionHelper.FuncConvert(funcMethod, forLoop);
             return converted[0];
         }
-        
-        public void Define(MethodBody method, Instruction jumpInstruction)
+
+        void ILinqOperator.Define(MethodBody method, Instruction jumpInstruction)
         {
             var checkVariable = method.AddVariable(typeSystem.Boolean);
             var processor = method.GetILProcessor();

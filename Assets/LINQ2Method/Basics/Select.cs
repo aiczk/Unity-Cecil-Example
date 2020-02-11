@@ -19,7 +19,7 @@ namespace LINQ2Method.Basics
             this.forLoop = forLoop;
         }
 
-        public Instruction Next()
+        Instruction ILinqOperator.Next()
         {
             var returnType = funcMethod.Method.ReturnType;
             if (returnType.Name != forLoop.LocalDefinition.VariableType.Name)
@@ -31,8 +31,8 @@ namespace LINQ2Method.Basics
             converted = Convert(funcMethod);
             return converted[0];
         }
-        
-        public void Define(MethodBody method, Instruction jumpInstruction = null)
+
+        void ILinqOperator.Define(MethodBody method, Instruction jumpInstruction)
         {
             var processor = method.GetILProcessor();
             

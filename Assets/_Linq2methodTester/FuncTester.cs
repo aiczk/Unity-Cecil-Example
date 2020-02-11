@@ -14,7 +14,7 @@ namespace _Script
          {
              var enumerable = new [] {new Hoo(2), new Hoo(41) };
 
-             var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index > 114514).Select(x => x.Index);
+             var s = enumerable.Where(x => x.Index % 2 == 0).Select(x => x.Index).Where(x => x > 114514);
          }
 
          private void CC(int[] arr)
