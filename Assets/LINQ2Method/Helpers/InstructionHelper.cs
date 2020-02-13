@@ -59,7 +59,11 @@ namespace LINQ2Method.Helpers
             return variable;
         }
         
-        public static GenericParameter AsGenericParameter(this IGenericParameterProvider provider) => new GenericParameter(provider);
+        public static GenericParameter AsGenericParameter(this TypeReference provider) => 
+            new GenericParameter(provider);
+        
+        public static GenericParameter AsGenericParameter(this TypeReference provider, string name) => 
+            new GenericParameter(name, provider);
 
         // ReSharper disable once ReturnTypeCanBeEnumerable.Global
         public static Instruction[] FuncConvert(MethodBody funcMethod, For forLoop)

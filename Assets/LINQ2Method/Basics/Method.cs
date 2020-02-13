@@ -27,6 +27,7 @@ namespace LINQ2Method.Basics
 
         public void Create(string methodName, TypeReference argsType, TypeReference returnType)
         {
+            ResetReturnType(argsType, returnType);
             methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
             classDefinition.Methods.Add(methodDefinition);
             arg.Define(methodDefinition.Body, argsType);
@@ -52,14 +53,14 @@ namespace LINQ2Method.Basics
 
         public void Build()
         {
-            var loop = operators.Count;
-            for (var i = 0; i < loop; i++)
+            for (var i = 0; i < operators.Count; i++)
             {
                 var linqOperator = operators.Dequeue();
                 
                 if ((linqOperator as Where) != null)
                 {
                     ILinqOperator nextOperator = null;
+                    
                     if (operators.Count != 0) 
                         nextOperator = operators.Peek();
                     
@@ -70,6 +71,14 @@ namespace LINQ2Method.Basics
                 
                 linqOperator.Define(Body, null);
             }
+        }
+
+        private void ResetReturnType(TypeReference argsType, TypeReference returnType)
+        {
+            var genericParameter = returnType.GenericParameters;
+            
+            genericParameter.Clear();
+            genericParameter.Add(new GenericParameter(argsType));
         }
     }
 }

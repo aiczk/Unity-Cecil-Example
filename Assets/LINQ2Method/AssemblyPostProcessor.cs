@@ -38,7 +38,7 @@ namespace LINQ2Method
         private static void Execute(ModuleDefinition mainModule)
         {
             var mainDefinition = mainModule.GetType("_Script", "FuncTester");
-            var returnType = mainModule.ImportReference(typeof(IEnumerable<>));
+            var returnType = mainModule.ImportReference(typeof(IEnumerable<Hoo>));
 
             var typeSystem = mainModule.TypeSystem;
             var nestedType = mainDefinition.NestedTypes[0];
@@ -49,7 +49,6 @@ namespace LINQ2Method
             var where2 = new Where(typeSystem, nestedType.Methods[3], method.ForLoop);
             var select = new Select(nestedType.Methods[4], method.ForLoop);
             
-            returnType.GenericParameters.Add(argType.AsGenericParameter());
             method.Create("TestMethod", argType, returnType);
             method.Begin();
 
