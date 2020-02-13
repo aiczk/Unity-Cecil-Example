@@ -3,7 +3,7 @@
 namespace LINQ2Method.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class OptimizationAttribute : Attribute
+    public class OptimizeAttribute : Attribute
     {
         
     }

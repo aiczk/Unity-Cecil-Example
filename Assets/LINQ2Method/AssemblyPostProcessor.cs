@@ -1,8 +1,7 @@
-﻿using System.Linq;
+﻿using System;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,8 +24,9 @@ namespace LINQ2Method
             try
             {
                 var readerParams = AssemblyHelper.ReadAndWrite();
-                var mainAssembly = AssemblyHelper.GetAssembly("Main").ToAssemblyDefinition(readerParams);
-                Execute(mainAssembly);
+                var mainAssembly = AssemblyHelper.FindModule("Main", readerParams);
+                var systemAssembly = AssemblyHelper.FindModule("mscorlib", readerParams);
+                Execute(mainAssembly, systemAssembly);
             }
             finally
             {
@@ -34,51 +34,23 @@ namespace LINQ2Method
             }
         }
 
-        private static void Execute(AssemblyDefinition mainAssembly)
+        private static void Execute(ModuleDefinition mainModule, ModuleDefinition coreModule)
         {
-            var mainModule = mainAssembly.MainModule;
-            var mainTestClassDefinition = mainModule.GetType("_Script", "FuncTester");
-
-/*            foreach (var nestedType in mainTestClassDefinition.NestedTypes)
-            {
-                foreach (var method in nestedType.Methods)
-                {
-                    if (method.Name.Equals(".ctor") || method.Name.Equals(".cctor"))
-                        continue;
-                    
-                }
-            }
-
-            foreach (var typeDefinition in mainModule.Types)
-            {
-                if(!typeDefinition.IsClass)
-                    continue;
-                
-                foreach (var method in typeDefinition.Methods)
-                {
-                    if (!method.CustomAttributes.Any(x => x.AttributeType.Name.Equals("OptimizationAttribute")))
-                        continue;
-
-                    var body = method.Body;
-                    
-                    foreach (var instruction in body.Instructions)
-                    {
-                        
-                    }
-                }
-            }
-*/
+            var iEnumerableDefinition = coreModule.GetType("System.Collections.Generic", "IEnumerable`1");
+            var mainDefinition = mainModule.GetType("_Script", "FuncTester");
+            mainModule.ImportReference(iEnumerableDefinition);
 
             var typeSystem = mainModule.TypeSystem;
-            var nestedType = mainTestClassDefinition.NestedTypes[0];
+            var nestedType = mainDefinition.NestedTypes[0];
             var argType = nestedType.Methods[2].Parameters[0].ParameterType;
-            var method = new Method(typeSystem, mainTestClassDefinition);
+            var method = new Method(typeSystem, mainDefinition);
+            iEnumerableDefinition.GenericParameters.Add(new GenericParameter(argType));
             var where = new Where(typeSystem, nestedType.Methods[2], method.ForLoop);
             var where2 = new Where(typeSystem, nestedType.Methods[3], method.ForLoop);
             var select = new Select(nestedType.Methods[4], method.ForLoop);
 
             var returnType = typeSystem.Void;
-            method.Create("TestMethod", argType, returnType);
+            method.Create("TestMethod", argType, iEnumerableDefinition);
             method.Begin();
 
             method.AddOperator(where);
