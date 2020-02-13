@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using _Script;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
@@ -25,8 +27,7 @@ namespace LINQ2Method
             {
                 var readerParams = AssemblyHelper.ReadAndWrite();
                 var mainAssembly = AssemblyHelper.FindModule("Main", readerParams);
-                var systemAssembly = AssemblyHelper.FindModule("mscorlib", readerParams);
-                Execute(mainAssembly, systemAssembly);
+                Execute(mainAssembly);
             }
             finally
             {
@@ -34,23 +35,22 @@ namespace LINQ2Method
             }
         }
 
-        private static void Execute(ModuleDefinition mainModule, ModuleDefinition coreModule)
+        private static void Execute(ModuleDefinition mainModule)
         {
-            var iEnumerableDefinition = coreModule.GetType("System.Collections.Generic", "IEnumerable`1");
             var mainDefinition = mainModule.GetType("_Script", "FuncTester");
-            mainModule.ImportReference(iEnumerableDefinition);
+            var returnType = mainModule.ImportReference(typeof(IEnumerable<>));
 
             var typeSystem = mainModule.TypeSystem;
             var nestedType = mainDefinition.NestedTypes[0];
             var argType = nestedType.Methods[2].Parameters[0].ParameterType;
             var method = new Method(typeSystem, mainDefinition);
-            iEnumerableDefinition.GenericParameters.Add(new GenericParameter(argType));
+
             var where = new Where(typeSystem, nestedType.Methods[2], method.ForLoop);
             var where2 = new Where(typeSystem, nestedType.Methods[3], method.ForLoop);
             var select = new Select(nestedType.Methods[4], method.ForLoop);
-
-            var returnType = typeSystem.Void;
-            method.Create("TestMethod", argType, iEnumerableDefinition);
+            
+            returnType.GenericParameters.Add(argType.AsGenericParameter());
+            method.Create("TestMethod", argType, returnType);
             method.Begin();
 
             method.AddOperator(where);
@@ -61,6 +61,32 @@ namespace LINQ2Method
             method.End();
             
             mainModule.Write("Test.dll");
+        }
+
+        private static void Add(ModuleDefinition main)
+        {
+            Dictionary<string, MethodDefinition> linq = new Dictionary<string, MethodDefinition>();
+            
+            foreach (var type in main.Types)
+            {
+                if(!type.IsClass)
+                    continue;
+                
+                if(!type.HasNestedTypes)
+                    continue;
+                
+                foreach (var nestedType in type.NestedTypes)
+                {
+                    if(!nestedType.IsClass)
+                        continue;
+
+                    if (!nestedType.HasMethods)
+                        continue;
+
+                    var methods = nestedType.Methods;
+                }
+            }
+            
         }
     }
 }

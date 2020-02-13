@@ -26,7 +26,7 @@ namespace LINQ2Method.Basics
 
         void ILinqOperator.Define(MethodBody method, Instruction jumpInstruction)
         {
-            var checkVariable = method.AddVariable(typeSystem.Boolean);
+            var checkVariable = method.AddVariableDefinition(typeSystem.Boolean);
             var processor = method.GetILProcessor();
 
             converted ??= InstructionHelper.FuncConvert(funcMethod, forLoop);

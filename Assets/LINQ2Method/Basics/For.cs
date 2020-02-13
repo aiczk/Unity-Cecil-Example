@@ -26,7 +26,7 @@ namespace LINQ2Method.Basics
 
         public void Start(MethodBody methodBody, int initValue = 0)
         {
-            IndexDefinition = methodBody.AddVariable(typeSystem.Int32);
+            IndexDefinition = methodBody.AddVariableDefinition(typeSystem.Int32);
             loopCheck = InstructionHelper.LdLoc(IndexDefinition);
             IncrementIndex = InstructionHelper.LdLoc(IndexDefinition);
             var processor = methodBody.GetILProcessor();
@@ -44,7 +44,7 @@ namespace LINQ2Method.Basics
         
         public void End(MethodBody methodBody)
         {
-            var withInVariable = methodBody.AddVariable(typeSystem.Boolean);
+            var withInVariable = methodBody.AddVariableDefinition(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
 
             //loop end
@@ -74,7 +74,7 @@ namespace LINQ2Method.Basics
 
         public void DefineLocal(MethodBody methodBody, TypeReference argType)
         { 
-            LocalDefinition = methodBody.AddVariable(argType);
+            LocalDefinition = methodBody.AddVariableDefinition(argType);
             var processor = methodBody.GetILProcessor();
             
             processor.Append(InstructionHelper.LdArg(1));

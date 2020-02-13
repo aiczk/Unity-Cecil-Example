@@ -41,7 +41,7 @@ namespace LINQ2Method.Basics
                 ldLoca ??= InstructionHelper.LdLoca(forLoop.LocalDefinition);
                 
                 processor.Append(ldLoca);
-                forLoop.LocalDefinition = method.AddVariable(funcMethod.Method.ReturnType);
+                forLoop.LocalDefinition = method.AddVariableDefinition(funcMethod.Method.ReturnType);
             }
 
             converted ??= Convert(funcMethod);

@@ -52,13 +52,15 @@ namespace LINQ2Method.Helpers
             return ldArg.Equals(OpCodes.Ldarg_S) ? Instruction.Create(ldArg, argIndex) : Instruction.Create(ldArg);
         }
         
-        public static VariableDefinition AddVariable(this MethodBody methodBody, TypeReference reference)
+        public static VariableDefinition AddVariableDefinition(this MethodBody methodBody, TypeReference reference)
         {
             var variable = new VariableDefinition(reference);
             methodBody.Variables.Add(variable);
             return variable;
         }
         
+        public static GenericParameter AsGenericParameter(this IGenericParameterProvider provider) => new GenericParameter(provider);
+
         // ReSharper disable once ReturnTypeCanBeEnumerable.Global
         public static Instruction[] FuncConvert(MethodBody funcMethod, For forLoop)
         {
