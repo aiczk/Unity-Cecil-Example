@@ -2,7 +2,6 @@
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
@@ -27,8 +26,9 @@ namespace LINQ2Method.Basics
 
         public void Create(string methodName, TypeReference argsType, TypeReference returnType)
         {
-            ResetReturnType(argsType, returnType);
+            //ResetReturnType(argsType, ref returnType);
             methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
+
             classDefinition.Methods.Add(methodDefinition);
             arg.Define(methodDefinition.Body, argsType);
             
@@ -73,12 +73,9 @@ namespace LINQ2Method.Basics
             }
         }
 
-        private void ResetReturnType(TypeReference argsType, TypeReference returnType)
+        private void ResetReturnType(TypeReference argsType, ref TypeReference returnType)
         {
-            var genericParameter = returnType.GenericParameters;
-            
-            genericParameter.Clear();
-            genericParameter.Add(new GenericParameter(argsType));
+            //returnType = returnType.MakeGenericType(argsType);
         }
     }
 }

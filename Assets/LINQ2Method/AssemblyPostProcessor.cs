@@ -4,6 +4,7 @@ using _Script;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
+using Mono.Cecil.Rocks;
 using UnityEditor;
 using UnityEngine;
 
@@ -38,7 +39,8 @@ namespace LINQ2Method
         private static void Execute(ModuleDefinition mainModule)
         {
             var mainDefinition = mainModule.GetType("_Script", "FuncTester");
-            var returnType = mainModule.ImportReference(typeof(IEnumerable<Hoo>));
+            var type = typeof(IEnumerable<>);
+            var returnType = mainModule.ImportReference(type);
 
             var typeSystem = mainModule.TypeSystem;
             var nestedType = mainDefinition.NestedTypes[0];

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using LINQ2Method.Basics;
+﻿using LINQ2Method.Basics;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
-using UnityEngine;
+// ReSharper disable once ReturnTypeCanBeEnumerable.Global
 
 namespace LINQ2Method.Helpers
 {
@@ -65,7 +62,6 @@ namespace LINQ2Method.Helpers
         public static GenericParameter AsGenericParameter(this TypeReference provider, string name) => 
             new GenericParameter(name, provider);
 
-        // ReSharper disable once ReturnTypeCanBeEnumerable.Global
         public static Instruction[] FuncConvert(MethodBody funcMethod, For forLoop)
         {
             var size = funcMethod.Instructions.Count - 1;
