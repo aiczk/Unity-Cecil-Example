@@ -12,6 +12,7 @@ namespace LINQ2Method.Basics
         private For forLoop;
         private Instruction ldLoca;
         private Instruction[] converted;
+        Operator ILinqOperator.Type => Operator.Select;
         
         public Select(MethodDefinition funcMethod, For forLoop)
         {

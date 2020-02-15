@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
     public class Method
     {
-        public For ForLoop { get; }
-        public MethodBody Body { get; private set; }
-
+        public For MainLoop { get; }
+        
+        private MethodBody methodBody;
         private Queue<ILinqOperator> operators;
         private TypeReference argType;
         private TypeDefinition classDefinition;
@@ -20,36 +22,41 @@ namespace LINQ2Method.Basics
         {
             this.classDefinition = classDefinition;
             operators = new Queue<ILinqOperator>();
-            ForLoop = new For(typeSystem);
+            MainLoop = new For(typeSystem);
             arg = new Arg();
         }
 
         public void Create(string methodName, TypeReference argsType, TypeReference returnType)
         {
-            //ResetReturnType(argsType, ref returnType);
             methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
 
             classDefinition.Methods.Add(methodDefinition);
             arg.Define(methodDefinition.Body, argsType);
             
-            Body = methodDefinition.Body;
+            methodBody = methodDefinition.Body;
             argType = argsType;
         }
-
+        
         public void Begin()
         {
-            ForLoop.Start(Body);
-            ForLoop.DefineLocal(Body, argType);
+            MainLoop.Start(methodBody);
+            MainLoop.DefineLocal(methodBody, argType);
         }
 
         public void End()
         {
-            ForLoop.End(Body);
+            MainLoop.End(methodBody);
             //todo return value
-            InstructionHelper.Return(Body);
+            InstructionHelper.Return(methodBody);
         }
 
-        public void AddOperator(ILinqOperator linqOperator) => operators.Enqueue(linqOperator);
+        public void AddOperator(ILinqOperator linqOperator)
+        {
+            if(linqOperator == null)
+                throw new NullReferenceException();
+            
+            operators.Enqueue(linqOperator);
+        }
 
         public void Build()
         {
@@ -57,19 +64,20 @@ namespace LINQ2Method.Basics
             {
                 var linqOperator = operators.Dequeue();
                 
-                if ((linqOperator as Where) != null)
+                if (linqOperator.Type == Operator.Where)
                 {
                     ILinqOperator nextOperator = null;
                     
                     if (operators.Count != 0) 
                         nextOperator = operators.Peek();
                     
-                    var nextProcess = nextOperator == null ? ForLoop.IncrementIndex : nextOperator.Next();
-                    linqOperator.Define(Body, nextProcess);
+                    var nextProcess = nextOperator == null ? MainLoop.LoopEnd : nextOperator.Next();
+                    linqOperator.Define(methodBody, nextProcess);
                     continue;
                 }
                 
-                linqOperator.Define(Body, null);
+                Debug.Log("Hi");
+                linqOperator.Define(methodBody, null);
             }
         }
 

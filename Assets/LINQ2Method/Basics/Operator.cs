@@ -4,6 +4,7 @@ namespace LINQ2Method.Basics
 {
     public interface ILinqOperator
     {
+        Operator Type { get; }
         void Define(MethodBody method, Instruction jumpInstruction);
         Instruction Next();
     }

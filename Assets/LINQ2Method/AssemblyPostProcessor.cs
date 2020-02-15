@@ -39,19 +39,18 @@ namespace LINQ2Method
         private static void Execute(ModuleDefinition mainModule)
         {
             var mainDefinition = mainModule.GetType("_Script", "FuncTester");
-            var type = typeof(IEnumerable<>);
-            var returnType = mainModule.ImportReference(type);
-
+            
             var typeSystem = mainModule.TypeSystem;
             var nestedType = mainDefinition.NestedTypes[0];
             var argType = nestedType.Methods[2].Parameters[0].ParameterType;
+            var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
             var method = new Method(typeSystem, mainDefinition);
 
-            var where = new Where(typeSystem, nestedType.Methods[2], method.ForLoop);
-            var where2 = new Where(typeSystem, nestedType.Methods[3], method.ForLoop);
-            var select = new Select(nestedType.Methods[4], method.ForLoop);
+            var where = new Where(typeSystem, nestedType.Methods[2], method.MainLoop);
+            var where2 = new Where(typeSystem, nestedType.Methods[3], method.MainLoop);
+            var select = new Select(nestedType.Methods[4], method.MainLoop);
             
-            method.Create("TestMethod", argType, returnType);
+            method.Create("TestMethod", argType, typeSystem.Void);
             method.Begin();
 
             method.AddOperator(where);

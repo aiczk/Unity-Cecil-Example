@@ -10,6 +10,7 @@ namespace LINQ2Method.Basics
         private MethodBody funcMethod;
         private TypeSystem typeSystem;
         private Instruction[] converted;
+        Operator ILinqOperator.Type => Operator.Where;
         
         public Where(TypeSystem typeSystem, MethodDefinition funcMethod, For forLoop)
         {

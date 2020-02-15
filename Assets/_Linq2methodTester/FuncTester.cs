@@ -24,6 +24,9 @@ namespace _Script
              foreach (var i in arr)
              {
                  //do!
+                 
+                 if(i == 0)
+                     continue;
              }
 
              return a;
@@ -39,9 +42,10 @@ namespace _Script
                  if(loc % 2 != 0)
                      continue;
                  
-                 if(loc > 10)
+                 if(loc > 114514)
                      continue;
-                 
+
+                 var s = loc;
                  Debug.Log("H");
                  //do
              }
