@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -60,7 +61,8 @@ namespace LINQ2Method.Basics
 
         public void Build()
         {
-            for (var i = 0; i < operators.Count; i++)
+            var count = operators.Count;
+            for (var i = 0; i < count; i++)
             {
                 var linqOperator = operators.Dequeue();
                 
@@ -76,7 +78,6 @@ namespace LINQ2Method.Basics
                     continue;
                 }
                 
-                Debug.Log("Hi");
                 linqOperator.Define(methodBody, null);
             }
         }
