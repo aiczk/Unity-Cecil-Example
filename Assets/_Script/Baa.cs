@@ -6,11 +6,11 @@ namespace _Script
     public class Baa : MonoBehaviour
     {
         [Inject]
-        private Foo foo = default;
+        private Fee fee = default;
         
         void Start()
         {
-            Debug.Log(foo.fooString);
+            Debug.Log(fee.fooString);
         }
 
         void Update()

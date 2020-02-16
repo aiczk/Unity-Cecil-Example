@@ -4,9 +4,15 @@ namespace LINQ2Method.Basics
 {
     public interface ILinqOperator
     {
-        Operator Type { get; }
+        OperatorType Type { get; }
         void Define(MethodBody method, Instruction jumpInstruction);
         Instruction Next();
+    }
+
+    public enum OperatorType
+    {
+        None,
+        Jump,
     }
     
     public enum Operator

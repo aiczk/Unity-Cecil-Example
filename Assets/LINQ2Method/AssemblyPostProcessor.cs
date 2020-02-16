@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using _Script;
+﻿using System.Collections.Generic;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using UnityEditor;
 using UnityEngine;
@@ -27,8 +26,9 @@ namespace LINQ2Method
             try
             {
                 var readerParams = AssemblyHelper.ReadAndWrite();
-                var mainAssembly = AssemblyHelper.FindModule("Main", readerParams);
-                Execute(mainAssembly);
+                var mainModule = AssemblyHelper.FindModule("Main", readerParams);
+                var l2MModule = AssemblyHelper.FindModule("L2MAttributes", readerParams);
+                Execute(mainModule,l2MModule);
             }
             finally
             {
@@ -36,57 +36,88 @@ namespace LINQ2Method
             }
         }
 
-        private static void Execute(ModuleDefinition mainModule)
+        private static void Execute(ModuleDefinition mainModule, ModuleDefinition l2MModule)
         {
-            var mainDefinition = mainModule.GetType("_Script", "FuncTester");
+            var l2MOptimizeAttribute = l2MModule.GetType("LINQ2Method.Attributes", "OptimizeAttribute");
+            var optimizeClasses = Search(mainModule, l2MOptimizeAttribute);
+            
+            if(optimizeClasses.Count < 0)
+                return;
+
+            foreach (var classDef in optimizeClasses)
+            {
+                foreach (var method in classDef.Methods)
+                {
+                    foreach (var instruction in method.Body.Instructions)
+                    {
+                        if(instruction.OpCode != OpCodes.Call)
+                            continue;
+                        
+                        //Debug.Log(instruction);
+                    }
+                }
+            }
             
             var typeSystem = mainModule.TypeSystem;
-            var nestedType = mainDefinition.NestedTypes[0];
-            var argType = nestedType.Methods[2].Parameters[0].ParameterType;
-            var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
-            var method = new Method(typeSystem, mainDefinition);
-
-            var where = new Where(typeSystem, nestedType.Methods[2], method.MainLoop);
-            var where2 = new Where(typeSystem, nestedType.Methods[3], method.MainLoop);
-            var select = new Select(nestedType.Methods[4], method.MainLoop);
+            foreach (var classDefinition in optimizeClasses)
+            {
+                var nestedType = classDefinition.NestedTypes[0];
+                var argType = nestedType.Methods[2].Parameters[0].ParameterType;
+                //var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
+                
+                var method = new Method(typeSystem, classDefinition);
+                var where = new Where(typeSystem, nestedType.Methods[2], method.MainLoop);
+                var where2 = new Where(typeSystem, nestedType.Methods[3], method.MainLoop);
+                var select = new Select(nestedType.Methods[4], method.MainLoop);
             
-            method.Create("TestMethod", argType, typeSystem.Void);
-            method.Begin();
+                method.Create("TestMethod", argType, typeSystem.Void);
+                method.Begin();
 
-            method.AddOperator(where);
-            method.AddOperator(where2);
-            method.AddOperator(select);
-
-            method.Build();
-            method.End();
+                method.AddOperator(where);
+                method.AddOperator(where2);
+                method.AddOperator(select);
+                method.BuildOperator();
+            
+                method.End();
+            }
             
             mainModule.Write("Test.dll");
         }
 
-        private static void Add(ModuleDefinition main)
+        private static List<TypeDefinition> Search(ModuleDefinition main, TypeDefinition attribute)
         {
-            Dictionary<string, MethodDefinition> linq = new Dictionary<string, MethodDefinition>();
+            var definitions = new List<TypeDefinition>();
+            var attributeName = attribute.Name;
             
-            foreach (var type in main.Types)
+            foreach (var classDefinition in main.Types)
             {
-                if(!type.IsClass)
+                if(!classDefinition.IsClass)
                     continue;
                 
-                if(!type.HasNestedTypes)
+                if(!classDefinition.HasMethods)
                     continue;
                 
-                foreach (var nestedType in type.NestedTypes)
+                if(!classDefinition.HasNestedTypes)
+                    continue;
+
+                foreach (var method in classDefinition.Methods)
                 {
-                    if(!nestedType.IsClass)
+                    if (!method.HasCustomAttributes)
                         continue;
+                    
+                    foreach (var customAttribute in method.CustomAttributes)
+                    {
+                        var attributeType = customAttribute.AttributeType;
 
-                    if (!nestedType.HasMethods)
-                        continue;
+                        if (attributeType.Name != attributeName)
+                            continue;
 
-                    var methods = nestedType.Methods;
+                        definitions.Add(classDefinition);
+                    }
                 }
             }
-            
+
+            return definitions;
         }
     }
 }

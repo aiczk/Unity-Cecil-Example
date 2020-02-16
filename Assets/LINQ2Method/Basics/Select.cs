@@ -12,7 +12,7 @@ namespace LINQ2Method.Basics
         private For forLoop;
         private Instruction ldLoca;
         private Instruction[] converted;
-        Operator ILinqOperator.Type => Operator.Select;
+        OperatorType ILinqOperator.Type => OperatorType.None;
         
         public Select(MethodDefinition funcMethod, For forLoop)
         {
@@ -23,13 +23,16 @@ namespace LINQ2Method.Basics
         Instruction ILinqOperator.Next()
         {
             var returnType = funcMethod.Method.ReturnType;
-            if (returnType.Name != forLoop.LocalDefinition.VariableType.Name)
+            var variableType = forLoop.LocalDefinition.VariableType;
+            if (returnType.Name != variableType.Name)
             {
                 ldLoca = InstructionHelper.LdLoca(forLoop.LocalDefinition);
                 return ldLoca;
             }
             
             converted = Convert(funcMethod);
+            converted[0] = InstructionHelper.LdLoc(forLoop.LocalDefinition);
+
             return converted[0];
         }
 
@@ -37,10 +40,8 @@ namespace LINQ2Method.Basics
         {
             var processor = method.GetILProcessor();
             
-            if (funcMethod.Method.ReturnType.Name != forLoop.LocalDefinition.VariableType.Name)
+            if (ldLoca != null)
             {
-                ldLoca ??= InstructionHelper.LdLoca(forLoop.LocalDefinition);
-                
                 processor.Append(ldLoca);
                 forLoop.LocalDefinition = method.AddVariableDefinition(funcMethod.Method.ReturnType);
             }
@@ -57,16 +58,15 @@ namespace LINQ2Method.Basics
             
             processor.Append(InstructionHelper.StLoc(forLoop.LocalDefinition));
         }
-
+        
         private static Instruction[] Convert(MethodBody funcMethod)
         {
-            var size = funcMethod.Instructions.Count;
+            var size = funcMethod.Instructions.Count - 1;
             var result = new Instruction[size];
             var instructions = funcMethod.Instructions;
             
             for (var i = 0; i < size; i++)
             {
-                ref var res = ref result[i];
                 var instruction = instructions[i];
                 var opCode = instruction.OpCode;
 
@@ -75,12 +75,11 @@ namespace LINQ2Method.Basics
 
                 if (opCode == OpCodes.Ret)
                     continue;
-                
-                res = instruction;
+
+                result[i] = instruction;
             }
             
             return result;
-
         }
 
     }

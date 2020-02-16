@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using _Script;
 using LINQ2Method.Attributes;
-using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace _Script
  {
      public class FuncTester
      {
-         [Optimize]
+         //[Optimize]
          private void Foo()
          {
-             var enumerable = new [] {new Hoo(2), new Hoo(41) };
-
+             var enumerable = new[] {new Hoge(2), new Hoge(41)};
              var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index > 114514).Select(x => x.Index);
          }
-
+         
          private IEnumerable<int> Dodo(int[] arr)
          {
              IEnumerable<int> a = new int[arr.Length];
@@ -31,63 +28,25 @@ namespace _Script
 
              return a;
          }
-
-         private void CC(int[] arr)
-         {
-             int length = arr.Length;
-             for(var i = 0; i < arr.Length; i++)
-             {
-                 var loc = arr[i];
-                 
-                 if(loc % 2 != 0)
-                     continue;
-                 
-                 if(loc > 114514)
-                     continue;
-
-                 var s = loc;
-                 Debug.Log("H");
-                 //do
-             }
-
-         }
+         
+         //public void METHOD(){}
      }
 
-     public class Hoo : IEquatable<Hoo>
+     public class Foo
      {
-         public int Index;
-
-         public Hoo(int index)
+         //private FuncTester funcTester = new FuncTester();
+         
+         [Optimize]
+         private void Boo()
          {
-             this.Index = index;
-         }
+             //MEthod();
+             //funcTester.METHOD();
 
-         public bool Equals(Hoo other)
-         {
-             return other != null && other.Index == Index;
-         }
+             var enumerable = new[] {2, 41};
 
-         public override bool Equals(object obj)
-         {
-             if (ReferenceEquals(null, obj)) return false;
-             if (ReferenceEquals(this, obj)) return true;
-             if (obj.GetType() != this.GetType()) return false;
-             return Equals((Hoo) obj);
+             var s = enumerable.Where(x => x % 2 == 0).Where(x => x > 10).Select(x => x * 2);
          }
-
-         public override int GetHashCode()
-         {
-             throw new NotImplementedException();
-         }
-
-         public static bool operator ==(Hoo left, Hoo right)
-         {
-             return Equals(left, right);
-         }
-
-         public static bool operator !=(Hoo left, Hoo right)
-         {
-             return !Equals(left, right);
-         }
+         
+         //private void MEthod(){}
      }
  }

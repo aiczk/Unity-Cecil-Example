@@ -30,7 +30,7 @@ namespace LINQ2Method.Basics
         public void Create(string methodName, TypeReference argsType, TypeReference returnType)
         {
             methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
-
+            
             classDefinition.Methods.Add(methodDefinition);
             arg.Define(methodDefinition.Body, argsType);
             
@@ -59,21 +59,18 @@ namespace LINQ2Method.Basics
             operators.Enqueue(linqOperator);
         }
 
-        public void Build()
+        public void BuildOperator()
         {
             var count = operators.Count;
             for (var i = 0; i < count; i++)
             {
                 var linqOperator = operators.Dequeue();
                 
-                if (linqOperator.Type == Operator.Where)
+                if (linqOperator.Type == OperatorType.Jump)
                 {
-                    ILinqOperator nextOperator = null;
-                    
-                    if (operators.Count != 0) 
-                        nextOperator = operators.Peek();
-                    
+                    var nextOperator = operators.Count > 0 ? operators.Peek() : null;
                     var nextProcess = nextOperator == null ? MainLoop.LoopEnd : nextOperator.Next();
+                    
                     linqOperator.Define(methodBody, nextProcess);
                     continue;
                 }

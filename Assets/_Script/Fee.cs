@@ -7,7 +7,7 @@ using Debug = UnityEngine.Debug;
 
 namespace _Script
 {
-    public class Foo : SingletonMonoBehaviour<Foo>
+    public class Fee : SingletonMonoBehaviour<Fee>
     {
         public string fooString = "FOOO";
         private void Awake()
