@@ -20,7 +20,7 @@ namespace LINQ2Method.Basics
 
         Instruction ILinqOperator.Next()
         {
-            converted = InstructionHelper.ConvertFunction(funcMethod, forLoop, () => InstructionHelper.LdLoc(forLoop.LocalDefinition));
+            converted = InstructionHelper.ConvertFunction(funcMethod, forLoop);
             return converted[0];
         }
 
@@ -30,10 +30,8 @@ namespace LINQ2Method.Basics
             var returnType = funcMethod.Method.ReturnType;
             
             if (!TypeReferenceEquals(returnType, forLoop.LocalDefinition.VariableType))
-            {
                 forLoop.LocalDefinition = method.AddVariableDefinition(returnType);
-            }
-            
+
             foreach (var instruction in converted)
             {
                 processor.Append(instruction);

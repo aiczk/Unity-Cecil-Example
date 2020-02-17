@@ -51,7 +51,7 @@ namespace LINQ2Method.Basics
             InstructionHelper.Return(methodBody);
         }
 
-        public void AddOperator(ILinqOperator linqOperator)
+        public void AppendOperator(ILinqOperator linqOperator)
         {
             if(linqOperator == null)
                 throw new NullReferenceException();

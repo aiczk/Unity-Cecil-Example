@@ -29,9 +29,9 @@ namespace LINQ2Method.Basics
         {
             var checkVariable = method.AddVariableDefinition(typeSystem.Boolean);
             var processor = method.GetILProcessor();
-
+            
             converted ??= InstructionHelper.ConvertFunction(funcMethod, forLoop);
-
+            
             foreach (var instruction in converted)
             {
                 processor.Append(instruction);

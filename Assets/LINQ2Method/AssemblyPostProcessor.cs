@@ -69,13 +69,13 @@ namespace LINQ2Method
                 var where = new Where(typeSystem, nestedType.Methods[2], method.MainLoop);
                 var where2 = new Where(typeSystem, nestedType.Methods[3], method.MainLoop);
                 var select = new Select(nestedType.Methods[4], method.MainLoop);
-            
+
                 method.Create("TestMethod", argType, typeSystem.Void);
                 method.Begin();
 
-                method.AddOperator(where);
-                method.AddOperator(where2);
-                method.AddOperator(select);
+                method.AppendOperator(where);
+                method.AppendOperator(where2);
+                method.AppendOperator(select);
                 method.BuildOperator();
             
                 method.End();

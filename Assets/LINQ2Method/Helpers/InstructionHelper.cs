@@ -89,33 +89,6 @@ namespace LINQ2Method.Helpers
             return result;
         }
         
-        public static Instruction[] ConvertFunction(MethodBody funcMethod, For forLoop, Func<Instruction> func)
-        {
-            var size = funcMethod.Instructions.Count - 1;
-            var result = new Instruction[size];
-            var instructions = funcMethod.Instructions;
-
-            for (var i = 0; i < size; i++)
-            {
-                ref var res = ref result[i];
-                var instruction = instructions[i];
-                var opCode = instruction.OpCode;
-
-                if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
-                {
-                    res = func();
-                    continue;
-                }
-                
-                if (opCode == OpCodes.Ret)
-                    continue;
-
-                res = instruction;
-            }
-            
-            return result;
-        }
-
         public static void Return(MethodBody methodBody) => methodBody.GetILProcessor().Emit(OpCodes.Ret);
     }
 }
