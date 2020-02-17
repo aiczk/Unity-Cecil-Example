@@ -32,12 +32,12 @@ namespace _Script
 
      public class Foo
      {
-         //[Optimize]
+         [Optimize]
          private void Boo()
          {
              var enumerable = new[] {2, 41};
 
-             var s = enumerable.Where(x => x % 2 == 0).Where(x => x > 10).Select(x => x * 2);
+             var s = enumerable.Where(x => x % 2 == 0).Where(x => x > 10).Select(x => 2);
          }
      }
  }

@@ -62,7 +62,7 @@ namespace LINQ2Method.Helpers
         public static GenericParameter AsGenericParameter(this TypeReference provider, string name) => 
             new GenericParameter(name, provider);
 
-        public static Instruction[] ConvertFunc(MethodBody funcMethod, For forLoop)
+        public static Instruction[] ConvertFunction(MethodBody funcMethod, For forLoop)
         {
             var size = funcMethod.Instructions.Count - 1;
             var result = new Instruction[size];
@@ -89,7 +89,7 @@ namespace LINQ2Method.Helpers
             return result;
         }
         
-        public static Instruction[] ConvertFunc(MethodBody funcMethod, For forLoop, Func<Instruction> func)
+        public static Instruction[] ConvertFunction(MethodBody funcMethod, For forLoop, Func<Instruction> func)
         {
             var size = funcMethod.Instructions.Count - 1;
             var result = new Instruction[size];
