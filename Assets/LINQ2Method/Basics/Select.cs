@@ -1,16 +1,14 @@
-﻿using System.Linq;
-using LINQ2Method.Helpers;
+﻿using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
+    //fixme 設計がクソ
     public class Select : ILinqOperator
     {
         private MethodBody funcMethod;
         private For forLoop;
-        private Instruction ldLoca;
         private Instruction[] converted;
         OperatorType ILinqOperator.Type => OperatorType.None;
         
@@ -22,31 +20,22 @@ namespace LINQ2Method.Basics
 
         Instruction ILinqOperator.Next()
         {
-            var returnType = funcMethod.Method.ReturnType;
-            var variableType = forLoop.LocalDefinition.VariableType;
-            if (returnType.Name != variableType.Name)
-            {
-                ldLoca = InstructionHelper.LdLoca(forLoop.LocalDefinition);
-                return ldLoca;
-            }
+            converted = InstructionHelper.ConvertFunc(funcMethod, forLoop, Convert);
             
-            converted = Convert(funcMethod);
-            converted[0] = InstructionHelper.LdLoc(forLoop.LocalDefinition);
-
             return converted[0];
         }
 
         void ILinqOperator.Define(MethodBody method, Instruction jumpInstruction)
         {
             var processor = method.GetILProcessor();
-            
-            if (ldLoca != null)
-            {
-                processor.Append(ldLoca);
-                forLoop.LocalDefinition = method.AddVariableDefinition(funcMethod.Method.ReturnType);
-            }
 
-            converted ??= Convert(funcMethod);
+            converted ??= InstructionHelper.ConvertFunc(funcMethod, forLoop, Convert);
+
+            var returnType = funcMethod.Method.ReturnType;
+            if (!TypeReferenceEquals(returnType, forLoop.LocalDefinition.VariableType))
+            {
+                forLoop.LocalDefinition = method.AddVariableDefinition(returnType);
+            }
             
             foreach (var instruction in converted)
             {
@@ -59,28 +48,13 @@ namespace LINQ2Method.Basics
             processor.Append(InstructionHelper.StLoc(forLoop.LocalDefinition));
         }
         
-        private static Instruction[] Convert(MethodBody funcMethod)
+        private Instruction Convert()
         {
-            var size = funcMethod.Instructions.Count - 1;
-            var result = new Instruction[size];
-            var instructions = funcMethod.Instructions;
-            
-            for (var i = 0; i < size; i++)
-            {
-                var instruction = instructions[i];
-                var opCode = instruction.OpCode;
-
-                if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
-                    continue;
-
-                if (opCode == OpCodes.Ret)
-                    continue;
-
-                result[i] = instruction;
-            }
-            
-            return result;
+            return TypeReferenceEquals(funcMethod.Method.ReturnType, forLoop.LocalDefinition.VariableType)
+                ? InstructionHelper.LdLoca(forLoop.LocalDefinition)
+                : InstructionHelper.LdLoc(forLoop.LocalDefinition);
         }
 
+        private bool TypeReferenceEquals(TypeReference t0, TypeReference t1) => t0.Name == t1.Name;
     }
 }

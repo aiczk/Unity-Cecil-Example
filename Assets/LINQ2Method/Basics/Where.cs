@@ -21,7 +21,7 @@ namespace LINQ2Method.Basics
 
         Instruction ILinqOperator.Next()
         {
-            converted = InstructionHelper.FuncConvert(funcMethod, forLoop);
+            converted = InstructionHelper.ConvertFunc(funcMethod, forLoop);
             return converted[0];
         }
 
@@ -30,7 +30,7 @@ namespace LINQ2Method.Basics
             var checkVariable = method.AddVariableDefinition(typeSystem.Boolean);
             var processor = method.GetILProcessor();
 
-            converted ??= InstructionHelper.FuncConvert(funcMethod, forLoop);
+            converted ??= InstructionHelper.ConvertFunc(funcMethod, forLoop);
 
             foreach (var instruction in converted)
             {

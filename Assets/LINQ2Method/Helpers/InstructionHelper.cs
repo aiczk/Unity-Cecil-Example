@@ -1,4 +1,5 @@
-﻿using LINQ2Method.Basics;
+﻿using System;
+using LINQ2Method.Basics;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 // ReSharper disable once ReturnTypeCanBeEnumerable.Global
@@ -28,7 +29,6 @@ namespace LINQ2Method.Helpers
         {
             if (definition.VariableType.IsValueType)
                 return Instruction.Create(OpCodes.Ldloca_S, definition);
-            
             
             var ldLoc = OpCodeHelper.LdLoc(definition.Index);
             return ldLoc == OpCodes.Ldloc_S ? Instruction.Create(ldLoc, definition) : Instruction.Create(ldLoc);
@@ -62,7 +62,7 @@ namespace LINQ2Method.Helpers
         public static GenericParameter AsGenericParameter(this TypeReference provider, string name) => 
             new GenericParameter(name, provider);
 
-        public static Instruction[] FuncConvert(MethodBody funcMethod, For forLoop)
+        public static Instruction[] ConvertFunc(MethodBody funcMethod, For forLoop)
         {
             var size = funcMethod.Instructions.Count - 1;
             var result = new Instruction[size];
@@ -77,6 +77,33 @@ namespace LINQ2Method.Helpers
                 if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
                 {
                     res = LdLoc(forLoop.LocalDefinition);
+                    continue;
+                }
+                
+                if (opCode == OpCodes.Ret)
+                    continue;
+
+                res = instruction;
+            }
+            
+            return result;
+        }
+        
+        public static Instruction[] ConvertFunc(MethodBody funcMethod, For forLoop, Func<Instruction> func)
+        {
+            var size = funcMethod.Instructions.Count - 1;
+            var result = new Instruction[size];
+            var instructions = funcMethod.Instructions;
+
+            for (var i = 0; i < size; i++)
+            {
+                ref var res = ref result[i];
+                var instruction = instructions[i];
+                var opCode = instruction.OpCode;
+
+                if (opCode == OpCodes.Ldarg_1 || opCode == OpCodes.Ldarga_S)
+                {
+                    res = func();
                     continue;
                 }
                 

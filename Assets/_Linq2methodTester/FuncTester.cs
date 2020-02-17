@@ -7,7 +7,7 @@ namespace _Script
  {
      public class FuncTester
      {
-         //[Optimize]
+         [Optimize]
          private void Foo()
          {
              var enumerable = new[] {new Hoge(2), new Hoge(41)};
@@ -28,25 +28,16 @@ namespace _Script
 
              return a;
          }
-         
-         //public void METHOD(){}
      }
 
      public class Foo
      {
-         //private FuncTester funcTester = new FuncTester();
-         
-         [Optimize]
+         //[Optimize]
          private void Boo()
          {
-             //MEthod();
-             //funcTester.METHOD();
-
              var enumerable = new[] {2, 41};
 
              var s = enumerable.Where(x => x % 2 == 0).Where(x => x > 10).Select(x => x * 2);
          }
-         
-         //private void MEthod(){}
      }
  }

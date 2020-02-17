@@ -43,7 +43,7 @@ namespace LINQ2Method
             
             if(optimizeClasses.Count < 0)
                 return;
-
+            
             foreach (var classDef in optimizeClasses)
             {
                 foreach (var method in classDef.Methods)
