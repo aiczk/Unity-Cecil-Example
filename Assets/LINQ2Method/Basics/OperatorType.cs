@@ -19,6 +19,7 @@ namespace LINQ2Method.Basics
     
     public enum Operator
     {
+        None,
         Where,
         Select,
         SelectMany,

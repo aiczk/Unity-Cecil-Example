@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
-using Mono.Cecil;
+﻿using Mono.Cecil;
 
 namespace LINQ2Method.Basics
 {
     public class OperatorContext
     {
-        public MethodDefinition Method { get; }
-        public Operator Operator { get; }
+        public MethodDefinition Function { get; }
+        public Operator OperatorType { get; }
 
-        public OperatorContext(MethodDefinition method, Operator @operator)
+        public OperatorContext(MethodDefinition function, Operator operatorType)
         {
-            Method = method;
-            Operator = @operator;
+            Function = function;
+            OperatorType = operatorType;
         }
     }
+
 }

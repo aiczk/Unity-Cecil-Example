@@ -42,12 +42,28 @@ namespace LINQ2Method
         {
             var l2MOptimizeAttribute = l2MModule.GetType("LINQ2Method.Attributes", "OptimizeAttribute");
             var optimizeClasses = Search(mainModule, l2MOptimizeAttribute);
-            var contexts = CreateContext(optimizeClasses);
-            
+
             if(optimizeClasses.Count < 0)
                 return;
             
             var typeSystem = mainModule.TypeSystem;
+            var contextFactory = new ContextFactory();
+            foreach (var optimizeClass in optimizeClasses)
+            {
+                var nestedType = optimizeClass.NestedTypes[0];
+                var argType = nestedType.Methods[2].Parameters[0].ParameterType;
+                var operators = contextFactory.CreateContext(optimizeClass);
+                var operatorContexts = contextFactory.CreateOperatorContext(optimizeClass);
+                var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
+
+                var method = new Method(typeSystem, optimizeClass);
+                method.Create("TestMethod", argType, returnType);
+                method.Begin();
+                method.BuildOperator();
+                method.End();
+            }
+
+/*
             foreach (var classDefinition in optimizeClasses)
             {
                 var nestedType = classDefinition.NestedTypes[0];
@@ -71,38 +87,9 @@ namespace LINQ2Method
             
                 method.End();
             }
+*/
             
             mainModule.Write("Test.dll");
-        }
-
-        private static List<OperatorContext> CreateContext(List<TypeDefinition> optimizeClasses)
-        {
-            var contexts = new List<OperatorContext>();
-
-            foreach (var classDefinition in optimizeClasses)
-            {
-                foreach (var method in classDefinition.Methods)
-                {
-                    foreach (var instruction in method.Body.Instructions)
-                    {
-                        if(instruction.OpCode != OpCodes.Call)
-                            continue;
-
-                        var str = instruction.Operand.ToString();
-                        str = Regex.Match(str, @"(?<=::).+?(?=<)").Value;
-                        
-                        if(str == string.Empty)
-                            continue;
-                        
-                        Debug.Log(str);
-                        var linqOperator = (Operator) Enum.Parse(typeof(Operator), str);
-                        var operatorContext = new OperatorContext(method, linqOperator);
-                        contexts.Add(operatorContext);
-                    }
-                }
-            }
-            
-            return contexts;
         }
 
         private static List<TypeDefinition> Search(ModuleDefinition main, TypeDefinition attribute)
