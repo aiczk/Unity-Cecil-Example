@@ -7,8 +7,15 @@ namespace _Script
  {
      public class FuncTester
      {
-         //[Optimize]
+         [Optimize]
          private void Foo()
+         {
+             var enumerable = new[] {new Hoge(2), new Hoge(41)};
+             var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index > 114514).Select(x => x.Index);
+         }
+         
+         [Optimize]
+         private void Doo()
          {
              var enumerable = new[] {new Hoge(2), new Hoge(41)};
              var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index > 114514).Select(x => x.Index);
@@ -32,7 +39,7 @@ namespace _Script
 
      public class Foo
      {
-         [Optimize]
+         //[Optimize]
          private void Boo()
          {
              var enumerable = new[] {2, 41};

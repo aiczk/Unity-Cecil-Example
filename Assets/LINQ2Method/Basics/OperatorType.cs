@@ -1,4 +1,5 @@
-﻿using Mono.Cecil.Cil;
+﻿using System;
+using Mono.Cecil.Cil;
 
 namespace LINQ2Method.Basics
 {
@@ -8,6 +9,7 @@ namespace LINQ2Method.Basics
         void Define(MethodBody method, Instruction jumpInstruction);
         Instruction Next();
     }
+    
 
     public enum OperatorType
     {

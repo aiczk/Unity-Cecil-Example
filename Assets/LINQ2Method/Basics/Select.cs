@@ -4,7 +4,6 @@ using Mono.Cecil.Cil;
 
 namespace LINQ2Method.Basics
 {
-    //fixme 設計がクソ
     public class Select : ILinqOperator
     {
         private MethodBody funcMethod;
