@@ -21,19 +21,13 @@ namespace _Script
              var s = enumerable.Select(x => x.Index).Where(x => x % 2 == 0).Where(x => x > 114514);
          }
          
-         private IEnumerable<int> Dodo(int[] arr)
+         private void Dodo(Hoge[] arr)
          {
-             IEnumerable<int> a = new int[arr.Length];
-
              foreach (var i in arr)
              {
                  //do!
-                 
-                 if(i == 0)
-                     continue;
+                 var ia = i.Index;
              }
-
-             return a;
          }
      }
 

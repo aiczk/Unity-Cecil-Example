@@ -27,11 +27,11 @@ namespace LINQ2Method.Basics
         {
             var processor = method.GetILProcessor();
             var returnType = funcMethod.Method.ReturnType;
+
+            converted ??= InstructionHelper.ConvertFunction(funcMethod, forLoop);
             
             if (!TypeReferenceEquals(returnType, forLoop.LocalDefinition.VariableType))
                 forLoop.LocalDefinition = method.AddVariableDefinition(returnType);
-
-            converted ??= InstructionHelper.ConvertFunction(funcMethod, forLoop);
             
             foreach (var instruction in converted)
             {

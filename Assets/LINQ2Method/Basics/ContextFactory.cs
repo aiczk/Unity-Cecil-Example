@@ -15,58 +15,7 @@ namespace LINQ2Method.Basics
         {
             this.optimizeClass = optimizeClass;
         }
-
-        public List<LinqOperator> MethodAnalysis(MethodDefinition targetMethod)
-        {
-            var calledOperators = CalledOperatorToken(targetMethod);
-            var nestedMethods = NestedMethodToken(targetMethod);
-            var operators = new List<LinqOperator>();
-            
-            for (int i = 0; i < calledOperators.Count; i++)
-            {
-                var c = calledOperators[i];
-                var l = nestedMethods[i];
-
-                var linqOperator = new LinqOperator(c, l);
-                operators.Add(linqOperator);
-            }
-
-            return operators;
-        }
         
-        private List<Operator> CalledOperatorToken(MethodDefinition method)
-        {
-            if (method.IsConstructor)
-                return null;
-            
-            var operators = new List<Operator>();
-            foreach (var instruction in method.Body.Instructions)
-            {
-                if(instruction.OpCode != OpCodes.Call)
-                    continue;
-
-                var genericInstanceMethod = (GenericInstanceMethod) instruction.Operand;
-                var linqOperator = (Operator) Enum.Parse(typeof(Operator), genericInstanceMethod.Name);
-                operators.Add(linqOperator);
-            }
-
-            return operators;
-        }
-        
-        private List<MethodDefinition> NestedMethodToken(MethodDefinition targetMethod)
-        {
-            var operators = new List<MethodDefinition>();
-            foreach (var instruction in targetMethod.Body.Instructions)
-            {
-                if (instruction.OpCode != OpCodes.Ldftn)
-                    continue;
-                
-                var method = (MethodDefinition) instruction.Operand;
-                operators.Add(method);
-            }
-            return operators;
-        }
-
         public List<MethodDefinition> ProcessMethods(string attributeName)
         {
             var methods = new List<MethodDefinition>();
@@ -88,6 +37,66 @@ namespace LINQ2Method.Basics
             }
 
             return methods;
+        }
+
+        public List<LinqOperator> MethodAnalysis(MethodDefinition targetMethod)
+        {
+            var calledOperators = CalledOperatorToken(targetMethod);
+            var nestedMethods = NestedMethodToken(targetMethod);
+            var operators = new List<LinqOperator>();
+            
+            for (int i = 0; i < calledOperators.Count; i++)
+            {
+                var c = calledOperators[i];
+                var l = nestedMethods[i];
+
+                var linqOperator = new LinqOperator(c, l);
+                operators.Add(linqOperator);
+            }
+
+            return operators;
+        }
+        
+        private List<Operator> CalledOperatorToken(MethodDefinition method)
+        {
+            return Base<Operator, GenericInstanceMethod>(method, OpCodes.Call, Cast);
+            
+            Operator Cast(MemberReference genericInstanceMethod) => 
+                (Operator) Enum.Parse(typeof(Operator), genericInstanceMethod.Name);
+        }
+
+        private List<MethodDefinition> NestedMethodToken(MethodDefinition targetMethod) => 
+            Base<MethodDefinition>(targetMethod, OpCodes.Ldftn);
+
+        private List<T> Base<T>(MethodDefinition method, OpCode opCode)
+        {
+            var operators = new List<T>();
+            foreach (var instruction in method.Body.Instructions)
+            {
+                if(instruction.OpCode != opCode)
+                    continue;
+
+                var cast = (T) instruction.Operand;
+                operators.Add(cast);
+            }
+
+            return operators;
+        }
+        
+        private List<T> Base<T,TC>(MethodDefinition method, OpCode opCode, Func<TC,T> func)
+        {
+            var operators = new List<T>();
+            foreach (var instruction in method.Body.Instructions)
+            {
+                if(instruction.OpCode != opCode)
+                    continue;
+
+                var cast = (TC) instruction.Operand;
+                var result = func(cast);
+                operators.Add(result);
+            }
+
+            return operators;
         }
     }
 }

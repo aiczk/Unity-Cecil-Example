@@ -66,13 +66,21 @@ namespace LINQ2Method
                     var operators = contextFactory.MethodAnalysis(targetMethod);
                     foreach (var linqOperator in operators)
                     {
-                        var op = linqOperator.Operator switch
+                        ILinqOperator op;
+                        switch (linqOperator.Operator)
                         {
-                            Operator.Where => (ILinqOperator) new Where(typeSystem, linqOperator.NestedFunction, method.MainLoop),
-                            Operator.Select => new Select(linqOperator.NestedFunction, method.MainLoop),
-                            _ => null
-                        };
-                        
+                            case Operator.Where:
+                                op = new Where(typeSystem, linqOperator.NestedFunction,
+                                    method.MainLoop);
+                                break;
+                            case Operator.Select:
+                                op = new Select(linqOperator.NestedFunction, method.MainLoop);
+                                break;
+                            default:
+                                op = null;
+                                break;
+                        }
+
                         method.AppendOperator(op);
                     }
                     
