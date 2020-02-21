@@ -19,7 +19,7 @@ namespace LINQ2Method
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            //PostCompile();
+            PostCompile();
         }
 
         private static void PostCompile()
@@ -47,33 +47,34 @@ namespace LINQ2Method
                 return;
             
             var typeSystem = mainModule.TypeSystem;
-            var contextFactory = new ContextFactory();
             foreach (var targetClass in optimizeClasses)
             {
                 var nestedType = targetClass.NestedTypes[0];
                 var argType = nestedType.Methods[2].Parameters[0].ParameterType;
+                //var returnType mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
                 var returnType = typeSystem.Void;
 
-                var methods = contextFactory.TargetMethods(targetClass, l2MOptimizeAttribute.Name);
+                var contextFactory = new ContextFactory(targetClass);
+                var methods = contextFactory.ProcessMethods(l2MOptimizeAttribute.Name);
                 
                 var method = new Method(typeSystem, targetClass);
                 foreach (var targetMethod in methods)
                 {
-                    var process = contextFactory.DefineOperator(targetMethod, null);
                     method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", argType, returnType);
                     method.Begin();
                     
-//                    foreach (var linqOperator in process)
-//                    {
-//                        var linOperator = linqOperator.Operator switch
-//                        {
-//                            Operator.Where => (ILinqOperator) new Where(typeSystem, linqOperator.NestedFunction, method.MainLoop),
-//                            Operator.Select => new Select(linqOperator.NestedFunction, method.MainLoop),
-//                            _ => null
-//                        };
-//                        
-//                        method.AppendOperator(linOperator);
-//                    }
+                    var operators = contextFactory.MethodAnalysis(targetMethod);
+                    foreach (var linqOperator in operators)
+                    {
+                        var op = linqOperator.Operator switch
+                        {
+                            Operator.Where => (ILinqOperator) new Where(typeSystem, linqOperator.NestedFunction, method.MainLoop),
+                            Operator.Select => new Select(linqOperator.NestedFunction, method.MainLoop),
+                            _ => null
+                        };
+                        
+                        method.AppendOperator(op);
+                    }
                     
                     method.BuildOperator();
                     method.End();
@@ -103,7 +104,8 @@ namespace LINQ2Method
                 {
                     if (!method.HasCustomAttributes)
                         continue;
-                    
+
+                    var find = false;
                     foreach (var customAttribute in method.CustomAttributes)
                     {
                         var attributeType = customAttribute.AttributeType;
@@ -111,8 +113,15 @@ namespace LINQ2Method
                         if (attributeType.Name != attributeName)
                             continue;
 
-                        definitions.Add(classDefinition);
+                        find = true;
+                        break;
                     }
+
+                    if (!find)
+                        continue;
+                    
+                    definitions.Add(classDefinition);
+                    break;
                 }
             }
 
