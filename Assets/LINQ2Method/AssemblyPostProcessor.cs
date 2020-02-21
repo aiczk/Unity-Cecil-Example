@@ -19,7 +19,7 @@ namespace LINQ2Method
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            PostCompile();
+            //PostCompile();
         }
 
         private static void PostCompile()
@@ -48,47 +48,38 @@ namespace LINQ2Method
             
             var typeSystem = mainModule.TypeSystem;
             var contextFactory = new ContextFactory();
-            foreach (var optimizeClass in optimizeClasses)
+            foreach (var targetClass in optimizeClasses)
             {
-                var nestedType = optimizeClass.NestedTypes[0];
+                var nestedType = targetClass.NestedTypes[0];
                 var argType = nestedType.Methods[2].Parameters[0].ParameterType;
-                var operators = contextFactory.CreateContext(optimizeClass);
-                var operatorContexts = contextFactory.CreateOperatorContext(optimizeClass);
-                var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
+                var returnType = typeSystem.Void;
 
-                var method = new Method(typeSystem, optimizeClass);
-                method.Create("TestMethod", argType, returnType);
-                method.Begin();
-                method.BuildOperator();
-                method.End();
-            }
-
-/*
-            foreach (var classDefinition in optimizeClasses)
-            {
-                var nestedType = classDefinition.NestedTypes[0];
-                var argType = nestedType.Methods[2].Parameters[0].ParameterType;
+                var methods = contextFactory.TargetMethods(targetClass, l2MOptimizeAttribute.Name);
                 
-                //TODO Selectの返り値を持ってくる
-                var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
-
-                var method = new Method(typeSystem, classDefinition);
-                var where = new Where(typeSystem, nestedType.Methods[2], method.MainLoop);
-                var where2 = new Where(typeSystem, nestedType.Methods[3], method.MainLoop);
-                var select = new Select(nestedType.Methods[4], method.MainLoop);
-
-                method.Create("TestMethod", argType, returnType);
-                method.Begin();
-
-                method.AppendOperator(where);
-                method.AppendOperator(where2);
-                method.AppendOperator(select);
-                method.BuildOperator();
-            
-                method.End();
+                var method = new Method(typeSystem, targetClass);
+                foreach (var targetMethod in methods)
+                {
+                    var process = contextFactory.DefineOperator(targetMethod, null);
+                    method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", argType, returnType);
+                    method.Begin();
+                    
+//                    foreach (var linqOperator in process)
+//                    {
+//                        var linOperator = linqOperator.Operator switch
+//                        {
+//                            Operator.Where => (ILinqOperator) new Where(typeSystem, linqOperator.NestedFunction, method.MainLoop),
+//                            Operator.Select => new Select(linqOperator.NestedFunction, method.MainLoop),
+//                            _ => null
+//                        };
+//                        
+//                        method.AppendOperator(linOperator);
+//                    }
+                    
+                    method.BuildOperator();
+                    method.End();
+                }
             }
-*/
-            
+
             mainModule.Write("Test.dll");
         }
 

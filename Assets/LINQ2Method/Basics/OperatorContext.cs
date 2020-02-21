@@ -1,17 +1,17 @@
 ﻿using Mono.Cecil;
+using Mono.Collections.Generic;
 
 namespace LINQ2Method.Basics
 {
-    public class OperatorContext
+    public class LinqOperator
     {
-        public MethodDefinition Function { get; }
-        public Operator OperatorType { get; }
-
-        public OperatorContext(MethodDefinition function, Operator operatorType)
+        public Operator Operator { get; }
+        public MethodDefinition NestedFunction { get; }
+        
+        public LinqOperator(Operator @operator, MethodDefinition nestedFunction)
         {
-            Function = function;
-            OperatorType = operatorType;
+            Operator = @operator;
+            NestedFunction = nestedFunction;
         }
     }
-
 }

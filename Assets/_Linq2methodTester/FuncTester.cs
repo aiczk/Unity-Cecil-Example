@@ -18,7 +18,7 @@ namespace _Script
          private void Doo()
          {
              var enumerable = new[] {new Hoge(2), new Hoge(41)};
-             var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index > 114514).Select(x => x.Index);
+             var s = enumerable.Select(x => x.Index).Where(x => x % 2 == 0).Where(x => x > 114514);
          }
          
          private IEnumerable<int> Dodo(int[] arr)

@@ -31,6 +31,8 @@ namespace LINQ2Method.Basics
             if (!TypeReferenceEquals(returnType, forLoop.LocalDefinition.VariableType))
                 forLoop.LocalDefinition = method.AddVariableDefinition(returnType);
 
+            converted ??= InstructionHelper.ConvertFunction(funcMethod, forLoop);
+            
             foreach (var instruction in converted)
             {
                 processor.Append(instruction);
