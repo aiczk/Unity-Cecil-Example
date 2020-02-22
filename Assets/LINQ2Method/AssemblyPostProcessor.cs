@@ -55,32 +55,18 @@ namespace LINQ2Method
                 var returnType = typeSystem.Void;
 
                 var contextFactory = new ContextFactory(targetClass);
-                var methods = contextFactory.ProcessMethods(l2MOptimizeAttribute.Name);
+                var methods = contextFactory.OptimizeMethods(l2MOptimizeAttribute.Name);
                 
                 var method = new Method(typeSystem, targetClass);
                 foreach (var targetMethod in methods)
                 {
+                    var operators = contextFactory.AnalysisMethod(targetMethod);
                     method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", argType, returnType);
                     method.Begin();
                     
-                    var operators = contextFactory.MethodAnalysis(targetMethod);
                     foreach (var linqOperator in operators)
                     {
-                        ILinqOperator op;
-                        switch (linqOperator.Operator)
-                        {
-                            case Operator.Where:
-                                op = new Where(typeSystem, linqOperator.NestedFunction,
-                                    method.MainLoop);
-                                break;
-                            case Operator.Select:
-                                op = new Select(linqOperator.NestedFunction, method.MainLoop);
-                                break;
-                            default:
-                                op = null;
-                                break;
-                        }
-
+                        var op = contextFactory.Gen(linqOperator, typeSystem, method);
                         method.AppendOperator(op);
                     }
                     

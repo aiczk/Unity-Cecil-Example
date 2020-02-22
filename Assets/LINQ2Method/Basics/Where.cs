@@ -10,7 +10,7 @@ namespace LINQ2Method.Basics
         private MethodBody funcMethod;
         private TypeSystem typeSystem;
         private Instruction[] converted;
-        OperatorType ILinqOperator.Type => OperatorType.Jump;
+        OpCodeType ILinqOperator.Type => OpCodeType.Jump;
         
         public Where(TypeSystem typeSystem, MethodDefinition funcMethod, For forLoop)
         {

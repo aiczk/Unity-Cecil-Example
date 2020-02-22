@@ -16,7 +16,7 @@ namespace LINQ2Method.Basics
             this.optimizeClass = optimizeClass;
         }
         
-        public List<MethodDefinition> ProcessMethods(string attributeName)
+        public List<MethodDefinition> OptimizeMethods(string attributeName)
         {
             var methods = new List<MethodDefinition>();
             foreach (var method in optimizeClass.Methods)
@@ -39,7 +39,26 @@ namespace LINQ2Method.Basics
             return methods;
         }
 
-        public List<LinqOperator> MethodAnalysis(MethodDefinition targetMethod)
+        public ILinqOperator Gen(LinqOperator linqOperator, TypeSystem typeSystem, Method method)
+        {
+            ILinqOperator op;
+            switch (linqOperator.Operator)
+            {
+                case Operator.Where:
+                    op = new Where(typeSystem, linqOperator.NestedMethod, method.MainLoop);
+                    break;
+                case Operator.Select:
+                    op = new Select(linqOperator.NestedMethod, method.MainLoop);
+                    break;
+                default:
+                    op = null;
+                    break;
+            }
+
+            return op;
+        }
+
+        public List<LinqOperator> AnalysisMethod(MethodDefinition targetMethod)
         {
             var calledOperators = CalledOperatorToken(targetMethod);
             var nestedMethods = NestedMethodToken(targetMethod);
@@ -47,10 +66,10 @@ namespace LINQ2Method.Basics
             
             for (int i = 0; i < calledOperators.Count; i++)
             {
-                var c = calledOperators[i];
-                var l = nestedMethods[i];
-
-                var linqOperator = new LinqOperator(c, l);
+                var calledOperator = calledOperators[i];
+                var nestedMethod = nestedMethods[i];
+                var linqOperator = new LinqOperator(calledOperator, nestedMethod);
+                
                 operators.Add(linqOperator);
             }
 
@@ -59,16 +78,16 @@ namespace LINQ2Method.Basics
         
         private List<Operator> CalledOperatorToken(MethodDefinition method)
         {
-            return Base<Operator, GenericInstanceMethod>(method, OpCodes.Call, Cast);
+            return AnalysisBase<Operator, GenericInstanceMethod>(method, OpCodes.Call, Cast);
             
             Operator Cast(MemberReference genericInstanceMethod) => 
                 (Operator) Enum.Parse(typeof(Operator), genericInstanceMethod.Name);
         }
 
         private List<MethodDefinition> NestedMethodToken(MethodDefinition targetMethod) => 
-            Base<MethodDefinition>(targetMethod, OpCodes.Ldftn);
+            AnalysisBase<MethodDefinition>(targetMethod, OpCodes.Ldftn);
 
-        private List<T> Base<T>(MethodDefinition method, OpCode opCode)
+        private List<T> AnalysisBase<T>(MethodDefinition method, OpCode opCode)
         {
             var operators = new List<T>();
             foreach (var instruction in method.Body.Instructions)
@@ -83,7 +102,7 @@ namespace LINQ2Method.Basics
             return operators;
         }
         
-        private List<T> Base<T,TC>(MethodDefinition method, OpCode opCode, Func<TC,T> func)
+        private List<T> AnalysisBase<T,TC>(MethodDefinition method, OpCode opCode, Func<TC,T> func)
         {
             var operators = new List<T>();
             foreach (var instruction in method.Body.Instructions)

@@ -33,7 +33,7 @@ namespace _Script
 
      public class Foo
      {
-         //[Optimize]
+         [Optimize]
          private void Boo()
          {
              var enumerable = new[] {2, 41};

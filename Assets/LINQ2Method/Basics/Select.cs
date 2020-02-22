@@ -9,7 +9,7 @@ namespace LINQ2Method.Basics
         private MethodBody funcMethod;
         private For forLoop;
         private Instruction[] converted;
-        OperatorType ILinqOperator.Type => OperatorType.None;
+        OpCodeType ILinqOperator.Type => OpCodeType.None;
         
         public Select(MethodDefinition funcMethod, For forLoop)
         {
