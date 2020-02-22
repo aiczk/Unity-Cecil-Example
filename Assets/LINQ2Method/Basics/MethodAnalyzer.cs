@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using UnityEngine;
 
 namespace LINQ2Method.Basics
@@ -19,9 +21,9 @@ namespace LINQ2Method.Basics
         }
         
         //todo ここに置くべきではないので移植する
-        public List<MethodDefinition> OptimizeMethods(string attributeName)
+        public Collection<MethodDefinition> OptimizeMethods(string attributeName)
         {
-            var methods = new List<MethodDefinition>();
+            var methods = new Collection<MethodDefinition>();
             foreach (var method in optimizeClass.Methods)
             {
                 if (!method.HasCustomAttributes)
@@ -62,10 +64,10 @@ namespace LINQ2Method.Basics
             return op;
         }
         
-        public AnalysedMethod Analyse(MethodDefinition targetMethod)
+        public AnalysedMethod Analyze(MethodDefinition targetMethod)
         {
-            var calledOperators = CalledOperatorToken(targetMethod);
-            var nestedMethods = NestedMethodToken(targetMethod);
+            var calledOperators = CalledOperatorTokens(targetMethod);
+            var nestedMethods = NestedMethodTokens(targetMethod);
             var operators = new List<LinqOperator>();
             
             for (var i = 0; i < calledOperators.Count; i++)
@@ -76,13 +78,13 @@ namespace LINQ2Method.Basics
                 
                 operators.Add(linqOperator);
             }
-
+            
             return new AnalysedMethod(operators);
         }
         
-        private List<Operator> CalledOperatorToken(MethodDefinition method)
+        private ReadOnlyCollection<Operator> CalledOperatorTokens(MethodDefinition method)
         {
-            var operators = new List<Operator>();
+            var operators = new Collection<Operator>();
             foreach (var instruction in method.Body.Instructions)
             {
                 if(instruction.OpCode != OpCodes.Call)
@@ -93,14 +95,14 @@ namespace LINQ2Method.Basics
                 operators.Add(result);
             }
 
-            return operators;
+            return operators.ToReadOnlyCollection();
             
             Operator Cast(MemberReference genericInstanceMethod) => (Operator) Enum.Parse(typeof(Operator), genericInstanceMethod.Name);
         }
 
-        private List<MethodDefinition> NestedMethodToken(MethodDefinition method)
+        private ReadOnlyCollection<MethodDefinition> NestedMethodTokens(MethodDefinition method)
         {
-            var operators = new List<MethodDefinition>();
+            var operators = new Collection<MethodDefinition>();
             foreach (var instruction in method.Body.Instructions)
             {
                 if(instruction.OpCode != OpCodes.Ldftn)
@@ -110,7 +112,7 @@ namespace LINQ2Method.Basics
                 operators.Add(cast);
             }
 
-            return operators;
+            return operators.ToReadOnlyCollection();
         }
     }
 }

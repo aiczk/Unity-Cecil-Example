@@ -60,7 +60,7 @@ namespace LINQ2Method
                 var method = new Method(typeSystem, targetClass);
                 foreach (var targetMethod in methods)
                 {
-                    var analyseResult = methodAnalyzer.Analyse(targetMethod);
+                    var analyseResult = methodAnalyzer.Analyze(targetMethod);
                     method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", argType, returnType);
                     method.Begin();
                     

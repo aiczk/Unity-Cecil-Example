@@ -9,7 +9,6 @@ namespace LINQ2Method.Basics
         void Define(MethodBody method, Instruction jumpInstruction);
         Instruction Next();
     }
-    
 
     public enum OpCodeType
     {

@@ -22,14 +22,14 @@ namespace LINQ2Method.Basics
     {
         public TypeReference Parameter => arg ??= GetArgType();
         public TypeReference ReturnType => returnType;
-        public IReadOnlyList<LinqOperator> Operators { get; }
+        public IReadOnlyCollection<LinqOperator> Operators { get; }
 
         private TypeReference arg;
         private TypeReference returnType;
 
-        public AnalysedMethod(IReadOnlyList<LinqOperator> linqOperators)
+        public AnalysedMethod(IReadOnlyCollection<LinqOperator> operators)
         {
-            Operators = linqOperators;
+            Operators = operators;
         }
 
         private TypeReference GetArgType()
