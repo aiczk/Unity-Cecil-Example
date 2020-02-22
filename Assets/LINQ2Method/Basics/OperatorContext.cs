@@ -18,29 +18,25 @@ namespace LINQ2Method.Basics
         }
     }
 
-    public class AnalysisResult
+    public class AnalysedMethod
     {
-        public TypeReference Arg { get; private set; }
-        public TypeReference ReturnType { get; private set; }
+        public TypeReference Parameter => arg ??= GetArgType();
+        public TypeReference ReturnType => returnType;
+        public IReadOnlyList<LinqOperator> Operators { get; }
 
-        private IReadOnlyList<LinqOperator> linqOperators;
+        private TypeReference arg;
+        private TypeReference returnType;
 
-        public AnalysisResult(IReadOnlyList<LinqOperator> linqOperators)
+        public AnalysedMethod(IReadOnlyList<LinqOperator> linqOperators)
         {
-            this.linqOperators = linqOperators;
+            Operators = linqOperators;
         }
 
         private TypeReference GetArgType()
         {
-            var first = linqOperators[0];
-            var type = first.NestedMethod.GenericParameters;
-
-            foreach (var genericParameter in type)
-            {
-                Debug.Log(genericParameter);
-            }
-
-            return default;
+            var firstOperator = Operators.First();
+            var parameterDefinition = firstOperator.NestedMethod.Parameters.First();
+            return parameterDefinition.ParameterType;
         }
     }
 }

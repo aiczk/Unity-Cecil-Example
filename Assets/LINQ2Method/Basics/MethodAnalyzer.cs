@@ -7,17 +7,18 @@ using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
-    public class ContextFactory
+    public class MethodAnalyzer
     {
         private TypeSystem typeSystem;
         private TypeDefinition optimizeClass;
 
-        public ContextFactory(TypeSystem typeSystem, TypeDefinition optimizeClass)
+        public MethodAnalyzer(TypeSystem typeSystem, TypeDefinition optimizeClass)
         {
             this.typeSystem = typeSystem;
             this.optimizeClass = optimizeClass;
         }
         
+        //todo ここに置くべきではないので移植する
         public List<MethodDefinition> OptimizeMethods(string attributeName)
         {
             var methods = new List<MethodDefinition>();
@@ -41,6 +42,7 @@ namespace LINQ2Method.Basics
             return methods;
         }
 
+        //todo ここに置くべきではないので移植する
         public ILinqOperator Generate(LinqOperator linqOperator, Method method)
         {
             ILinqOperator op;
@@ -59,8 +61,8 @@ namespace LINQ2Method.Basics
 
             return op;
         }
-
-        public List<LinqOperator> AnalyseMethod(MethodDefinition targetMethod)
+        
+        public AnalysedMethod Analyse(MethodDefinition targetMethod)
         {
             var calledOperators = CalledOperatorToken(targetMethod);
             var nestedMethods = NestedMethodToken(targetMethod);
@@ -75,46 +77,37 @@ namespace LINQ2Method.Basics
                 operators.Add(linqOperator);
             }
 
-            return operators;
+            return new AnalysedMethod(operators);
         }
         
         private List<Operator> CalledOperatorToken(MethodDefinition method)
         {
-            return AnalysisBase<Operator, GenericInstanceMethod>(method, OpCodes.Call, Cast);
-            
-            Operator Cast(MemberReference genericInstanceMethod) => 
-                (Operator) Enum.Parse(typeof(Operator), genericInstanceMethod.Name);
-        }
-
-        private List<MethodDefinition> NestedMethodToken(MethodDefinition targetMethod) => 
-            AnalysisBase<MethodDefinition>(targetMethod, OpCodes.Ldftn);
-
-        private List<T> AnalysisBase<T>(MethodDefinition method, OpCode opCode)
-        {
-            var operators = new List<T>();
+            var operators = new List<Operator>();
             foreach (var instruction in method.Body.Instructions)
             {
-                if(instruction.OpCode != opCode)
+                if(instruction.OpCode != OpCodes.Call)
                     continue;
 
-                var cast = (T) instruction.Operand;
-                operators.Add(cast);
+                var genericInstanceMethod = (GenericInstanceMethod) instruction.Operand;
+                var result = Cast(genericInstanceMethod);
+                operators.Add(result);
             }
 
             return operators;
+            
+            Operator Cast(MemberReference genericInstanceMethod) => (Operator) Enum.Parse(typeof(Operator), genericInstanceMethod.Name);
         }
-        
-        private List<T> AnalysisBase<T,TC>(MethodDefinition method, OpCode opCode, Func<TC,T> func)
+
+        private List<MethodDefinition> NestedMethodToken(MethodDefinition method)
         {
-            var operators = new List<T>();
+            var operators = new List<MethodDefinition>();
             foreach (var instruction in method.Body.Instructions)
             {
-                if(instruction.OpCode != opCode)
+                if(instruction.OpCode != OpCodes.Ldftn)
                     continue;
 
-                var cast = (TC) instruction.Operand;
-                var result = func(cast);
-                operators.Add(result);
+                var cast = (MethodDefinition) instruction.Operand;
+                operators.Add(cast);
             }
 
             return operators;
