@@ -9,10 +9,12 @@ namespace LINQ2Method.Basics
 {
     public class ContextFactory
     {
+        private TypeSystem typeSystem;
         private TypeDefinition optimizeClass;
 
-        public ContextFactory(TypeDefinition optimizeClass)
+        public ContextFactory(TypeSystem typeSystem, TypeDefinition optimizeClass)
         {
+            this.typeSystem = typeSystem;
             this.optimizeClass = optimizeClass;
         }
         
@@ -39,7 +41,7 @@ namespace LINQ2Method.Basics
             return methods;
         }
 
-        public ILinqOperator Gen(LinqOperator linqOperator, TypeSystem typeSystem, Method method)
+        public ILinqOperator Generate(LinqOperator linqOperator, Method method)
         {
             ILinqOperator op;
             switch (linqOperator.Operator)
@@ -58,13 +60,13 @@ namespace LINQ2Method.Basics
             return op;
         }
 
-        public List<LinqOperator> AnalysisMethod(MethodDefinition targetMethod)
+        public List<LinqOperator> AnalyseMethod(MethodDefinition targetMethod)
         {
             var calledOperators = CalledOperatorToken(targetMethod);
             var nestedMethods = NestedMethodToken(targetMethod);
             var operators = new List<LinqOperator>();
             
-            for (int i = 0; i < calledOperators.Count; i++)
+            for (var i = 0; i < calledOperators.Count; i++)
             {
                 var calledOperator = calledOperators[i];
                 var nestedMethod = nestedMethods[i];

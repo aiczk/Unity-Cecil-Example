@@ -54,19 +54,19 @@ namespace LINQ2Method
                 //var returnType mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
                 var returnType = typeSystem.Void;
 
-                var contextFactory = new ContextFactory(targetClass);
+                var contextFactory = new ContextFactory(typeSystem, targetClass);
                 var methods = contextFactory.OptimizeMethods(l2MOptimizeAttribute.Name);
                 
                 var method = new Method(typeSystem, targetClass);
                 foreach (var targetMethod in methods)
                 {
-                    var operators = contextFactory.AnalysisMethod(targetMethod);
+                    var operators = contextFactory.AnalyseMethod(targetMethod);
                     method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", argType, returnType);
                     method.Begin();
                     
                     foreach (var linqOperator in operators)
                     {
-                        var op = contextFactory.Gen(linqOperator, typeSystem, method);
+                        var op = contextFactory.Generate(linqOperator, method);
                         method.AppendOperator(op);
                     }
                     
