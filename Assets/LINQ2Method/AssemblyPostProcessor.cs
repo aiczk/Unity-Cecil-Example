@@ -19,7 +19,7 @@ namespace LINQ2Method
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            PostCompile();
+            //PostCompile();
         }
 
         private static void PostCompile()

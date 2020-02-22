@@ -63,56 +63,46 @@ namespace LINQ2Method.Basics
 
             return op;
         }
-        
-        public AnalysedMethod Analyze(MethodDefinition targetMethod)
+
+        public AnalysedMethod Analyze(MethodDefinition method)
         {
-            var calledOperators = CalledOperatorTokens(targetMethod);
-            var nestedMethods = NestedMethodTokens(targetMethod);
+            MethodDefinition nestedMethodToken = null;
+            Operator operatorType = Operator.None;
+            
             var operators = new List<LinqOperator>();
             
-            for (var i = 0; i < calledOperators.Count; i++)
+            foreach (var instruction in method.Body.Instructions)
             {
-                var calledOperator = calledOperators[i];
-                var nestedMethod = nestedMethods[i];
-                var linqOperator = new LinqOperator(calledOperator, nestedMethod);
+                var opCode = instruction.OpCode;
+
+                if (opCode != OpCodes.Ldftn && opCode != OpCodes.Call)
+                    continue;
                 
+                if (opCode == OpCodes.Ldftn)
+                {
+                    nestedMethodToken = GetToken<MethodDefinition>(instruction);
+                    continue;
+                }
+
+                if (opCode == OpCodes.Call)
+                {
+                    var operatorMethodToken = GetToken<GenericInstanceMethod>(instruction);
+                    operatorType = (Operator) Enum.Parse(typeof(Operator), operatorMethodToken.Name);
+                }
+
+                if (nestedMethodToken == null || operatorType == Operator.None) 
+                    continue;
+                
+                var linqOperator = new LinqOperator(operatorType, nestedMethodToken);
                 operators.Add(linqOperator);
+
+                nestedMethodToken = null;
+                operatorType = Operator.None;
             }
-            
+
             return new AnalysedMethod(operators);
-        }
-        
-        private ReadOnlyCollection<Operator> CalledOperatorTokens(MethodDefinition method)
-        {
-            var operators = new Collection<Operator>();
-            foreach (var instruction in method.Body.Instructions)
-            {
-                if(instruction.OpCode != OpCodes.Call)
-                    continue;
-
-                var genericInstanceMethod = (GenericInstanceMethod) instruction.Operand;
-                var result = Cast(genericInstanceMethod);
-                operators.Add(result);
-            }
-
-            return operators.ToReadOnlyCollection();
             
-            Operator Cast(MemberReference genericInstanceMethod) => (Operator) Enum.Parse(typeof(Operator), genericInstanceMethod.Name);
-        }
-
-        private ReadOnlyCollection<MethodDefinition> NestedMethodTokens(MethodDefinition method)
-        {
-            var operators = new Collection<MethodDefinition>();
-            foreach (var instruction in method.Body.Instructions)
-            {
-                if(instruction.OpCode != OpCodes.Ldftn)
-                    continue;
-
-                var cast = (MethodDefinition) instruction.Operand;
-                operators.Add(cast);
-            }
-
-            return operators.ToReadOnlyCollection();
+            T GetToken<T>(Instruction instruction) => (T) instruction.Operand;
         }
     }
 }
