@@ -21,7 +21,7 @@ namespace LINQ2Method.Basics
         private TypeReference GetArgType()
         {
             var firstOperator = Operators.First();
-            var parameterDefinition = firstOperator.InnerMethod.Parameters.First();
+            var parameterDefinition = firstOperator.NestedMethod.Parameters.First();
             return parameterDefinition.ParameterType;
         }
     }

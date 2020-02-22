@@ -12,49 +12,77 @@ namespace LINQ2Method.Basics
     public class MethodAnalyzer
     {
         private TypeSystem typeSystem;
-        private TypeDefinition optimizeClass;
 
-        public MethodAnalyzer(TypeSystem typeSystem, TypeDefinition optimizeClass)
+        public MethodAnalyzer(TypeSystem typeSystem)
         {
             this.typeSystem = typeSystem;
-            this.optimizeClass = optimizeClass;
         }
         
-        //todo ここに置くべきではないので移植する
-        public Collection<MethodDefinition> OptimizeMethods(string attributeName)
+        public AnalyzedMethod Analyze(MethodDefinition targetMethod)
         {
-            var methods = new Collection<MethodDefinition>();
-            foreach (var method in optimizeClass.Methods)
-            {
-                if (!method.HasCustomAttributes)
-                    continue;
-                    
-                foreach (var customAttribute in method.CustomAttributes)
-                {
-                    var attributeType = customAttribute.AttributeType;
+            var calledOperators = CalledOperatorTokens(targetMethod);
+            var nestedMethods = NestedMethodTokens(targetMethod);
+            var operators = new List<LinqOperator>();	
 
-                    if (attributeType.Name != attributeName)
-                        continue;
-                    
-                    methods.Add(method);
-                    break;
-                }
+            for (var i = 0; i < calledOperators.Count; i++)
+            {	
+                var calledOperator = calledOperators[i];	
+                var nestedMethod = nestedMethods[i];	
+                var linqOperator = new LinqOperator(nestedMethod, calledOperator);	
+
+                operators.Add(linqOperator);	
             }
 
-            return methods;
+            return new AnalyzedMethod(operators);
         }
+        
+        private ReadOnlyCollection<Operator> CalledOperatorTokens(MethodDefinition method)	
+        {	
+            var operators = new Collection<Operator>();	
+            foreach (var instruction in method.Body.Instructions)
+            {
+                if(instruction.OpCode != OpCodes.Call)
+                    continue;
 
-        //todo ここに置くべきではないので移植する
+
+                var genericInstanceMethod = GetToken<GenericInstanceMethod>(instruction);
+                var result = Cast(genericInstanceMethod);
+                operators.Add(result);	
+            }
+
+            return operators.ToReadOnlyCollection();
+            
+            Operator Cast(MemberReference genericInstanceMethod) => (Operator) Enum.Parse(typeof(Operator), genericInstanceMethod.Name);
+        }
+        
+        private ReadOnlyCollection<MethodDefinition> NestedMethodTokens(MethodDefinition method) 
+        {	
+            var operators = new Collection<MethodDefinition>();	
+            foreach (var instruction in method.Body.Instructions)	
+            {	
+                if(instruction.OpCode != OpCodes.Ldftn)	
+                    continue;
+
+                var cast = GetToken<MethodDefinition>(instruction);
+                operators.Add(cast);
+            }
+
+
+            return operators.ToReadOnlyCollection();
+        }
+        
+        private T GetToken<T>(Instruction instruction) => (T) instruction.Operand;
+
         public ILinqOperator Generate(LinqOperator linqOperator, Method method)
         {
             ILinqOperator op;
             switch (linqOperator.Operator)
             {
                 case Operator.Where:
-                    op = new Where(typeSystem, linqOperator.InnerMethod, method.MainLoop);
+                    op = new Where(typeSystem, linqOperator.NestedMethod, method.MainLoop);
                     break;
                 case Operator.Select:
-                    op = new Select(linqOperator.InnerMethod, method.MainLoop);
+                    op = new Select(linqOperator.NestedMethod, method.MainLoop);
                     break;
                 default:
                     op = null;
@@ -62,47 +90,6 @@ namespace LINQ2Method.Basics
             }
 
             return op;
-        }
-
-        public AnalyzedMethod Analyze(MethodDefinition method)
-        {
-            var operators = new List<LinqOperator>();
-            MethodDefinition nestedMethodToken = null;
-            var operatorType = Operator.None;
-            
-            foreach (var instruction in method.Body.Instructions)
-            {
-                var opCode = instruction.OpCode;
-
-                if (opCode != OpCodes.Ldftn && opCode != OpCodes.Call)
-                    continue;
-                
-                if (opCode == OpCodes.Ldftn)
-                {
-                    nestedMethodToken = GetToken<MethodDefinition>(instruction);
-                    continue;
-                }
-
-                if (opCode == OpCodes.Call)
-                {
-                    var operatorMethodToken = GetToken<GenericInstanceMethod>(instruction);
-                    operatorType = (Operator) Enum.Parse(typeof(Operator), operatorMethodToken.Name);
-                    continue;
-                }
-
-                if (nestedMethodToken == null || operatorType == Operator.None) 
-                    continue;
-                
-                var linqOperator = new LinqOperator(nestedMethodToken, operatorType);
-                operators.Add(linqOperator);
-
-                nestedMethodToken = null;
-                operatorType = Operator.None;
-            }
-
-            return new AnalyzedMethod(operators);
-            
-            T GetToken<T>(Instruction instruction) => (T) instruction.Operand;
         }
     }
 }

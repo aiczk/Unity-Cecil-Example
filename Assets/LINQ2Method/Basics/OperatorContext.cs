@@ -7,11 +7,11 @@ namespace LINQ2Method.Basics
     public class LinqOperator
     {
         public Operator Operator { get; }
-        public MethodDefinition InnerMethod { get; }
+        public MethodDefinition NestedMethod { get; }
         
-        public LinqOperator(MethodDefinition innerMethod, Operator @operator)
+        public LinqOperator(MethodDefinition nestedMethod, Operator @operator)
         {
-            InnerMethod = innerMethod;
+            NestedMethod = nestedMethod;
             Operator = @operator;
         }
     }

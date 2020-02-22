@@ -47,30 +47,28 @@ namespace LINQ2Method
         private static void Execute(ModuleDefinition mainModule, ModuleDefinition l2MModule)
         {
             var l2MOptimizeAttribute = l2MModule.GetType("LINQ2Method.Attributes", "OptimizeAttribute");
-            var optimizeClasses = Search(mainModule, l2MOptimizeAttribute);
-
-            if(optimizeClasses.Count < 0)
-                return;
-            
             var typeSystem = mainModule.TypeSystem;
-            foreach (var targetClass in optimizeClasses)
+            
+            var classAnalyzer = new ClassAnalyzer(mainModule);
+            var methodAnalyzer = new MethodAnalyzer(typeSystem);
+            
+            var analyzedClass = classAnalyzer.Analyze(l2MOptimizeAttribute);
+            
+            foreach (var targetClass in analyzedClass.OptimizeTypes)
             {
                 var nestedType = targetClass.NestedTypes[0];
                 var argType = nestedType.Methods[2].Parameters[0].ParameterType;
                 //var returnType mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
                 var returnType = typeSystem.Void;
-
-                var methodAnalyzer = new MethodAnalyzer(typeSystem, targetClass);
-                var methods = methodAnalyzer.OptimizeMethods(l2MOptimizeAttribute.Name);
                 
                 var method = new Method(typeSystem, targetClass);
-                foreach (var targetMethod in methods)
+                foreach (var targetMethod in analyzedClass.OptimizeMethods)
                 {
-                    var analyzeResult = methodAnalyzer.Analyze(targetMethod);
-                    method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", argType, returnType);
+                    var analyzedMethod = methodAnalyzer.Analyze(targetMethod);
+                    method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", analyzedMethod.Parameter, returnType);
                     method.Begin();
                     
-                    foreach (var linqOperator in analyzeResult.Operators)
+                    foreach (var linqOperator in analyzedMethod.Operators)
                     {
                         var op = methodAnalyzer.Generate(linqOperator, method);
                         method.AppendOperator(op);
@@ -82,50 +80,6 @@ namespace LINQ2Method
             }
 
             mainModule.Write("Test.dll");
-        }
-
-        private static List<TypeDefinition> Search(ModuleDefinition main, TypeDefinition attribute)
-        {
-            var definitions = new List<TypeDefinition>();
-            var attributeName = attribute.Name;
-            
-            foreach (var classDefinition in main.Types)
-            {
-                if(!classDefinition.IsClass)
-                    continue;
-                
-                if(!classDefinition.HasMethods)
-                    continue;
-                
-                if(!classDefinition.HasNestedTypes)
-                    continue;
-
-                foreach (var method in classDefinition.Methods)
-                {
-                    if (!method.HasCustomAttributes)
-                        continue;
-
-                    var find = false;
-                    foreach (var customAttribute in method.CustomAttributes)
-                    {
-                        var attributeType = customAttribute.AttributeType;
-
-                        if (attributeType.Name != attributeName)
-                            continue;
-
-                        find = true;
-                        break;
-                    }
-
-                    if (!find)
-                        continue;
-                    
-                    definitions.Add(classDefinition);
-                    break;
-                }
-            }
-
-            return definitions;
         }
     }
 }
