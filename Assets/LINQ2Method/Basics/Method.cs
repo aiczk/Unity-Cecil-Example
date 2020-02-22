@@ -66,7 +66,7 @@ namespace LINQ2Method.Basics
             {
                 var linqOperator = operators.Dequeue();
                 
-                if (linqOperator.Type == OpCodeType.Jump)
+                if (linqOperator.Type == JumpType.Jump)
                 {
                     var nextOperator = operators.Count > 0 ? operators.Peek() : null;
                     var nextProcess = nextOperator == null ? MainLoop.LoopEnd : nextOperator.Next();

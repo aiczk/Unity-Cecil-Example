@@ -51,10 +51,10 @@ namespace LINQ2Method.Basics
             switch (linqOperator.Operator)
             {
                 case Operator.Where:
-                    op = new Where(typeSystem, linqOperator.NestedMethod, method.MainLoop);
+                    op = new Where(typeSystem, linqOperator.InnerMethod, method.MainLoop);
                     break;
                 case Operator.Select:
-                    op = new Select(linqOperator.NestedMethod, method.MainLoop);
+                    op = new Select(linqOperator.InnerMethod, method.MainLoop);
                     break;
                 default:
                     op = null;
@@ -64,12 +64,11 @@ namespace LINQ2Method.Basics
             return op;
         }
 
-        public AnalysedMethod Analyze(MethodDefinition method)
+        public AnalyzedMethod Analyze(MethodDefinition method)
         {
-            MethodDefinition nestedMethodToken = null;
-            Operator operatorType = Operator.None;
-            
             var operators = new List<LinqOperator>();
+            MethodDefinition nestedMethodToken = null;
+            var operatorType = Operator.None;
             
             foreach (var instruction in method.Body.Instructions)
             {
@@ -88,19 +87,20 @@ namespace LINQ2Method.Basics
                 {
                     var operatorMethodToken = GetToken<GenericInstanceMethod>(instruction);
                     operatorType = (Operator) Enum.Parse(typeof(Operator), operatorMethodToken.Name);
+                    continue;
                 }
 
                 if (nestedMethodToken == null || operatorType == Operator.None) 
                     continue;
                 
-                var linqOperator = new LinqOperator(operatorType, nestedMethodToken);
+                var linqOperator = new LinqOperator(nestedMethodToken, operatorType);
                 operators.Add(linqOperator);
 
                 nestedMethodToken = null;
                 operatorType = Operator.None;
             }
 
-            return new AnalysedMethod(operators);
+            return new AnalyzedMethod(operators);
             
             T GetToken<T>(Instruction instruction) => (T) instruction.Operand;
         }

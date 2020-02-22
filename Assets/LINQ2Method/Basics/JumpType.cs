@@ -5,12 +5,12 @@ namespace LINQ2Method.Basics
 {
     public interface ILinqOperator
     {
-        OpCodeType Type { get; }
+        JumpType Type { get; }
         void Define(MethodBody method, Instruction jumpInstruction);
         Instruction Next();
     }
 
-    public enum OpCodeType
+    public enum JumpType
     {
         None,
         Jump,
@@ -18,6 +18,7 @@ namespace LINQ2Method.Basics
     
     public enum Operator
     {
+        None,
         Where,
         Select,
         SelectMany,

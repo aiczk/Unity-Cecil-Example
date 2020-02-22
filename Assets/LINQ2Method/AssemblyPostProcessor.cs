@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
@@ -8,6 +9,7 @@ using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace LINQ2Method
 {
@@ -19,11 +21,13 @@ namespace LINQ2Method
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            //PostCompile();
+            PostCompile();
         }
 
         private static void PostCompile()
         {
+            //var stopWatch = new Stopwatch();
+            //stopWatch.Start();
             EditorApplication.LockReloadAssemblies();
             try
             {
@@ -36,6 +40,8 @@ namespace LINQ2Method
             {
                 EditorApplication.UnlockReloadAssemblies();
             }
+            //stopWatch.Stop();
+            //Debug.Log(stopWatch.Elapsed.ToString());
         }
 
         private static void Execute(ModuleDefinition mainModule, ModuleDefinition l2MModule)
@@ -60,11 +66,11 @@ namespace LINQ2Method
                 var method = new Method(typeSystem, targetClass);
                 foreach (var targetMethod in methods)
                 {
-                    var analyseResult = methodAnalyzer.Analyze(targetMethod);
+                    var analyzeResult = methodAnalyzer.Analyze(targetMethod);
                     method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", argType, returnType);
                     method.Begin();
                     
-                    foreach (var linqOperator in analyseResult.Operators)
+                    foreach (var linqOperator in analyzeResult.Operators)
                     {
                         var op = methodAnalyzer.Generate(linqOperator, method);
                         method.AppendOperator(op);
