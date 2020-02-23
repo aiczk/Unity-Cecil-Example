@@ -14,7 +14,7 @@ namespace _Script
              var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index > 114514).Select(x => x.Index);
          }
          
-         [Optimize]
+         //[Optimize]
          private void Doo()
          {
              var enumerable = new[] {new Hoge(2), new Hoge(41)};
@@ -33,7 +33,7 @@ namespace _Script
 
      public class Foo
      {
-         [Optimize]
+         //[Optimize]
          private void Boo()
          {
              var enumerable = new[] {2, 41};

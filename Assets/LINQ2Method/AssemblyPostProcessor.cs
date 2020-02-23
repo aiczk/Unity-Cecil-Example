@@ -21,7 +21,7 @@ namespace LINQ2Method
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            PostCompile();
+            //PostCompile();
         }
 
         private static void PostCompile()
@@ -53,17 +53,15 @@ namespace LINQ2Method
             var methodAnalyzer = new MethodAnalyzer(typeSystem);
             
             var analyzedClass = classAnalyzer.Analyze();
-            
+
+            //var returnType mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
             foreach (var targetClass in analyzedClass.OptimizeTypes)
             {
-                //var returnType mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
-                var returnType = typeSystem.Void;
-                
                 var methodBuilder = new MethodBuilder(typeSystem, targetClass);
                 foreach (var method in classAnalyzer.AnalyzeMethod(targetClass))
                 {
                     var analyzedMethod = methodAnalyzer.Analyze(method);
-                    methodBuilder.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", analyzedMethod.ParameterType, returnType);
+                    methodBuilder.Create(Guid.NewGuid().ToString("N"), analyzedMethod.ParameterType, analyzedMethod.ReturnType);
                     methodBuilder.Begin();
                     
                     foreach (var linqOperator in analyzedMethod.Operators)
