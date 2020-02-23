@@ -6,7 +6,7 @@ namespace LINQ2Method.Basics
 {
     public class AnalyzedMethod
     {
-        public TypeReference Parameter => arg ??= GetArgType();
+        public TypeReference ParameterType => arg ??= GetArgType();
         public TypeReference ReturnType => returnType;
         public IReadOnlyCollection<LinqOperator> Operators { get; }
 

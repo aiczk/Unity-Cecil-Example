@@ -59,16 +59,16 @@ namespace LINQ2Method.Basics
             T GetToken<T>(Instruction instruction) => (T) instruction.Operand;
         }
         
-        public ILinqOperator Generate(LinqOperator linqOperator, Method method)
+        public ILinqOperator Generate(LinqOperator linqOperator, MethodBuilder methodBuilder)
         {
             ILinqOperator op;
             switch (linqOperator.Operator)
             {
                 case Operator.Where:
-                    op = new Where(typeSystem, linqOperator.NestedMethod, method.MainLoop);
+                    op = new Where(typeSystem, linqOperator.NestedMethod, methodBuilder.MainLoop);
                     break;
                 case Operator.Select:
-                    op = new Select(linqOperator.NestedMethod, method.MainLoop);
+                    op = new Select(linqOperator.NestedMethod, methodBuilder.MainLoop);
                     break;
                 default:
                     op = null;

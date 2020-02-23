@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
-    public class Method
+    public class MethodBuilder
     {
         public For MainLoop { get; }
         
@@ -19,7 +19,7 @@ namespace LINQ2Method.Basics
         private MethodDefinition methodDefinition;
         private Arg arg;
 
-        public Method(TypeSystem typeSystem, TypeDefinition classDefinition)
+        public MethodBuilder(TypeSystem typeSystem, TypeDefinition classDefinition)
         {
             this.classDefinition = classDefinition;
             operators = new Queue<ILinqOperator>();
@@ -77,11 +77,6 @@ namespace LINQ2Method.Basics
                 
                 linqOperator.Define(methodBody, null);
             }
-        }
-
-        private void ResetReturnType(TypeReference argsType, ref TypeReference returnType)
-        {
-            //returnType = returnType.MakeGenericType(argsType);
         }
     }
 }

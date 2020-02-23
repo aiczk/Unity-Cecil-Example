@@ -56,26 +56,24 @@ namespace LINQ2Method
             
             foreach (var targetClass in analyzedClass.OptimizeTypes)
             {
-                var nestedType = targetClass.NestedTypes[0];
-                var argType = nestedType.Methods[2].Parameters[0].ParameterType;
                 //var returnType mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
                 var returnType = typeSystem.Void;
                 
-                var method = new Method(typeSystem, targetClass);
-                foreach (var targetMethod in classAnalyzer.Get(targetClass))
+                var methodBuilder = new MethodBuilder(typeSystem, targetClass);
+                foreach (var method in classAnalyzer.AnalyzeMethod(targetClass))
                 {
-                    var analyzedMethod = methodAnalyzer.Analyze(targetMethod);
-                    method.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", analyzedMethod.Parameter, returnType);
-                    method.Begin();
+                    var analyzedMethod = methodAnalyzer.Analyze(method);
+                    methodBuilder.Create($"TestMethod_{Guid.NewGuid().ToString("N")}", analyzedMethod.ParameterType, returnType);
+                    methodBuilder.Begin();
                     
                     foreach (var linqOperator in analyzedMethod.Operators)
                     {
-                        var op = methodAnalyzer.Generate(linqOperator, method);
-                        method.AppendOperator(op);
+                        var op = methodAnalyzer.Generate(linqOperator, methodBuilder);
+                        methodBuilder.AppendOperator(op);
                     }
                     
-                    method.BuildOperator();
-                    method.End();
+                    methodBuilder.BuildOperator();
+                    methodBuilder.End();
                 }
             }
 

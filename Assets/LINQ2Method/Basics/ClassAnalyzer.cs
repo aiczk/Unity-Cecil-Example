@@ -17,7 +17,7 @@ namespace LINQ2Method.Basics
             this.attribute = attribute;
         }
 
-        public ReadOnlyCollection<MethodDefinition> Get(TypeDefinition typeDefinition)
+        public ReadOnlyCollection<MethodDefinition> AnalyzeMethod(TypeDefinition typeDefinition)
         {
             var methods = new Collection<MethodDefinition>();
             var attributeName = attribute.Name;
@@ -44,7 +44,6 @@ namespace LINQ2Method.Basics
         public AnalyzedClass Analyze()
         {
             var classes = new List<TypeDefinition>();
-            var methods = new List<MethodDefinition>();
             var attributeName = attribute.Name;
             
             foreach (var classDefinition in moduleDefinition.Types)
@@ -60,23 +59,7 @@ namespace LINQ2Method.Basics
 
                 foreach (var methodDefinition in classDefinition.Methods)
                 {
-                    if (!methodDefinition.HasCustomAttributes)
-                        continue;
-
-                    var find = false;
-                    foreach (var customAttribute in methodDefinition.CustomAttributes)
-                    {
-                        var attributeType = customAttribute.AttributeType;
-
-                        if (attributeType.Name != attributeName)
-                            continue;
-                        
-                        methods.Add(methodDefinition);
-                        find = true;
-                        break;
-                    }
-                    
-                    if(!find)
+                    if(!CheckAttribute(methodDefinition,attributeName))
                         continue;
                     
                     classes.Add(classDefinition);
@@ -85,7 +68,7 @@ namespace LINQ2Method.Basics
             }
             
             //Debug.Log($"CLASS: {classes.Count}  METHOD: {methods.Count}");
-            return new AnalyzedClass(classes, methods);
+            return new AnalyzedClass(classes);
         }
         
         private bool CheckAttribute(MethodDefinition method, string attributeName)
@@ -98,12 +81,13 @@ namespace LINQ2Method.Basics
             {
                 var attributeType = customAttribute.AttributeType;
 
-                if (attributeType.Name != attributeName)
+                if (attributeType.Name != attributeName) 
                     continue;
-
+                
                 find = true;
                 break;
             }
+            
             return find;
         }
     }

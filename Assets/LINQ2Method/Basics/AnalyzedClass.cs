@@ -6,12 +6,10 @@ namespace LINQ2Method.Basics
     public class AnalyzedClass
     {
         public IReadOnlyCollection<TypeDefinition> OptimizeTypes { get; }
-        public IReadOnlyCollection<MethodDefinition> OptimizeMethods { get; }
 
-        public AnalyzedClass(IReadOnlyCollection<TypeDefinition> optimizeTypes, IReadOnlyCollection<MethodDefinition> optimizeMethods)
+        public AnalyzedClass(IReadOnlyCollection<TypeDefinition> optimizeTypes)
         {
             OptimizeTypes = optimizeTypes;
-            OptimizeMethods = optimizeMethods;
         }
     }
 }
