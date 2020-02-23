@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using Mono.Cecil;
+﻿using Mono.Cecil;
+using Mono.Collections.Generic;
 
 namespace LINQ2Method.Basics
 {
     public class AnalyzedClass
     {
-        public IReadOnlyCollection<TypeDefinition> OptimizeTypes { get; }
+        public ReadOnlyCollection<TypeDefinition> OptimizeTypes { get; }
 
-        public AnalyzedClass(IReadOnlyCollection<TypeDefinition> optimizeTypes)
+        public AnalyzedClass(ReadOnlyCollection<TypeDefinition> optimizeTypes)
         {
             OptimizeTypes = optimizeTypes;
         }

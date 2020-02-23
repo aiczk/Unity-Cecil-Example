@@ -2,6 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Rocks;
+using Mono.Collections.Generic;
 using UnityEngine;
 
 namespace LINQ2Method.Basics
@@ -10,12 +11,12 @@ namespace LINQ2Method.Basics
     {
         public TypeReference ParameterType => parameterType ??= GetArgType();
         public TypeReference ReturnType => returnType ??= GetReturnType();
-        public IReadOnlyCollection<LinqOperator> Operators { get; }
+        public ReadOnlyCollection<LinqOperator> Operators { get; }
 
         private TypeReference parameterType;
         private TypeReference returnType;
 
-        public AnalyzedMethod(IReadOnlyCollection<LinqOperator> operators)
+        public AnalyzedMethod(ReadOnlyCollection<LinqOperator> operators)
         {
             Operators = operators;
         }
@@ -29,7 +30,9 @@ namespace LINQ2Method.Basics
         
         private TypeReference GetReturnType()
         {
-            var lastOperator = Operators.Last();
+            //todo ハードコーディング
+            //select以外にもあるはず。
+            var lastOperator = Operators.Last(x => x.Operator == Operator.Select);
             var methodReturnType = lastOperator.NestedMethod.ReturnType;
             return methodReturnType;
         }

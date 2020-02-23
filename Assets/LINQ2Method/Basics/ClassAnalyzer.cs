@@ -43,7 +43,7 @@ namespace LINQ2Method.Basics
         
         public AnalyzedClass Analyze()
         {
-            var classes = new List<TypeDefinition>();
+            var classes = new Collection<TypeDefinition>();
             var attributeName = attribute.Name;
             
             foreach (var classDefinition in moduleDefinition.Types)
@@ -67,8 +67,7 @@ namespace LINQ2Method.Basics
                 }
             }
             
-            //Debug.Log($"CLASS: {classes.Count}  METHOD: {methods.Count}");
-            return new AnalyzedClass(classes);
+            return new AnalyzedClass(classes.ToReadOnlyCollection());
         }
         
         private bool CheckAttribute(MethodDefinition method, string attributeName)

@@ -23,7 +23,7 @@ namespace LINQ2Method.Basics
             MethodDefinition nestedMethodToken = null;
             Operator operatorType = Operator.None;
             
-            var operators = new List<LinqOperator>();
+            var operators = new Collection<LinqOperator>();
 
             foreach (var instruction in method.Body.Instructions)
             {
@@ -54,12 +54,12 @@ namespace LINQ2Method.Basics
                 operatorType = Operator.None;
             }
 
-            return new AnalyzedMethod(operators);
+            return new AnalyzedMethod(operators.ToReadOnlyCollection());
 
             T GetToken<T>(Instruction instruction) => (T) instruction.Operand;
         }
-        
-        public ILinqOperator Generate(LinqOperator linqOperator, MethodBuilder methodBuilder)
+
+        public ILinqOperator OperatorFactory(LinqOperator linqOperator, MethodBuilder methodBuilder)
         {
             ILinqOperator op;
             switch (linqOperator.Operator)
@@ -67,9 +67,11 @@ namespace LINQ2Method.Basics
                 case Operator.Where:
                     op = new Where(typeSystem, linqOperator.NestedMethod, methodBuilder.MainLoop);
                     break;
+                
                 case Operator.Select:
                     op = new Select(linqOperator.NestedMethod, methodBuilder.MainLoop);
                     break;
+                
                 default:
                     op = null;
                     break;

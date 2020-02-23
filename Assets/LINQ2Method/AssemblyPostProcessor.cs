@@ -21,7 +21,7 @@ namespace LINQ2Method
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            //PostCompile();
+            PostCompile();
         }
 
         private static void PostCompile()
@@ -66,8 +66,8 @@ namespace LINQ2Method
                     
                     foreach (var linqOperator in analyzedMethod.Operators)
                     {
-                        var op = methodAnalyzer.Generate(linqOperator, methodBuilder);
-                        methodBuilder.AppendOperator(op);
+                        var linq = methodAnalyzer.OperatorFactory(linqOperator, methodBuilder);
+                        methodBuilder.AppendOperator(linq);
                     }
                     
                     methodBuilder.BuildOperator();
