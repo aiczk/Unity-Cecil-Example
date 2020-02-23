@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using LINQ2Method.Helpers;
 using Mono.Cecil;
+using Mono.Collections.Generic;
 using UnityEngine;
 
 namespace LINQ2Method.Basics
@@ -7,13 +9,39 @@ namespace LINQ2Method.Basics
     public class ClassAnalyzer
     {
         private ModuleDefinition moduleDefinition;
+        private TypeDefinition attribute;
 
-        public ClassAnalyzer(ModuleDefinition moduleDefinition)
+        public ClassAnalyzer(ModuleDefinition moduleDefinition, TypeDefinition attribute)
         {
             this.moduleDefinition = moduleDefinition;
+            this.attribute = attribute;
+        }
+
+        public ReadOnlyCollection<MethodDefinition> Get(TypeDefinition typeDefinition)
+        {
+            var methods = new Collection<MethodDefinition>();
+            var attributeName = attribute.Name;
+            foreach (var methodDefinition in typeDefinition.Methods)
+            {
+                if (!methodDefinition.HasCustomAttributes)
+                    continue;
+
+                foreach (var customAttribute in methodDefinition.CustomAttributes)
+                {
+                    var attributeType = customAttribute.AttributeType;
+
+                    if (attributeType.Name != attributeName)
+                        continue;
+                        
+                    methods.Add(methodDefinition);
+                    break;
+                }
+            }
+
+            return methods.ToReadOnlyCollection();
         }
         
-        public AnalyzedClass Analyze(TypeDefinition attribute)
+        public AnalyzedClass Analyze()
         {
             var classes = new List<TypeDefinition>();
             var methods = new List<MethodDefinition>();
