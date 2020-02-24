@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using UnityEditor;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace LINQ2Method
 {
@@ -49,6 +44,7 @@ namespace LINQ2Method
             var l2MOptimizeAttribute = l2MModule.GetType("LINQ2Method.Attributes", "OptimizeAttribute");
             var typeSystem = mainModule.TypeSystem;
             
+            var methodBuilder = new MethodBuilder(typeSystem);
             var classAnalyzer = new ClassAnalyzer(mainModule, l2MOptimizeAttribute);
             var methodAnalyzer = new MethodAnalyzer(typeSystem);
             
@@ -57,11 +53,13 @@ namespace LINQ2Method
             //var returnType mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
             foreach (var targetClass in analyzedClass.OptimizeTypes)
             {
-                var methodBuilder = new MethodBuilder(typeSystem, targetClass);
                 foreach (var method in classAnalyzer.AnalyzeMethod(targetClass))
                 {
                     var analyzedMethod = methodAnalyzer.Analyze(method);
-                    methodBuilder.Create(Guid.NewGuid().ToString("N"), analyzedMethod.ParameterType, analyzedMethod.ReturnType);
+                    var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(analyzedMethod.ReturnType);
+                    var methodName = Guid.NewGuid().ToString("N");
+
+                    methodBuilder.Create(targetClass, methodName, analyzedMethod.ParameterType, returnType);
                     methodBuilder.Begin();
                     
                     foreach (var linqOperator in analyzedMethod.Operators)

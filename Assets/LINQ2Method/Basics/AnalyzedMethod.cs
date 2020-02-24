@@ -30,7 +30,7 @@ namespace LINQ2Method.Basics
         
         private TypeReference GetReturnType()
         {
-            //todo ハードコーディング
+            //todo ハードコーディングを改善する。
             //select以外にもあるはず。
             var lastOperator = Operators.Last(x => x.Operator == Operator.Select);
             var methodReturnType = lastOperator.NestedMethod.ReturnType;

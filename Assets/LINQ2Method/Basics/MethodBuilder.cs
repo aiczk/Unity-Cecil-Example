@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
@@ -15,27 +13,25 @@ namespace LINQ2Method.Basics
         private MethodBody methodBody;
         private Queue<ILinqOperator> operators;
         private TypeReference argType;
-        private TypeDefinition classDefinition;
         private MethodDefinition methodDefinition;
         private Arg arg;
 
-        public MethodBuilder(TypeSystem typeSystem, TypeDefinition classDefinition)
+        public MethodBuilder(TypeSystem typeSystem)
         {
-            this.classDefinition = classDefinition;
             operators = new Queue<ILinqOperator>();
             MainLoop = new For(typeSystem);
             arg = new Arg();
         }
 
-        public void Create(string methodName, TypeReference argsType, TypeReference returnType)
+        public void Create(TypeDefinition targetClass, string methodName, TypeReference paramsType, TypeReference returnType)
         {
             methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
             
-            classDefinition.Methods.Add(methodDefinition);
-            arg.Define(methodDefinition.Body, argsType);
+            targetClass.Methods.Add(methodDefinition);
+            arg.Define(methodDefinition.Body, paramsType);
             
             methodBody = methodDefinition.Body;
-            argType = argsType;
+            argType = paramsType;
         }
         
         public void Begin()
