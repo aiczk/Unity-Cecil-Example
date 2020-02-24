@@ -12,37 +12,40 @@ namespace LINQ2Method.Basics
     public class CacheCollection
     {
         private TypeSystem typeSystem;
-        private ModuleDefinition moduleDefinition;
+        private ModuleDefinition systemModule;
+        private ModuleDefinition mainModule;
 
-        private GenericInstanceType collection;
-        private TypeReference genericArgument;
-        private MethodDefinition getCount;
-        private MethodDefinition clear;
-        private Instruction nop; 
+        private FieldDefinition collection;
+        private GenericInstanceType iEnumerable;
+        
+        private MethodReference getCount;
+        private MethodReference clear;
 
-        public CacheCollection(ModuleDefinition moduleDefinition)
+        public CacheCollection(ModuleDefinition systemModule, ModuleDefinition mainModule)
         {
-            this.moduleDefinition = moduleDefinition;
-            typeSystem = moduleDefinition.TypeSystem;
+            this.systemModule = systemModule;
+            this.mainModule = mainModule;
+            typeSystem = systemModule.TypeSystem;
             
-            var methods = moduleDefinition.GetType("System.Collections.ObjectModel", "Collection`1").Methods;
-            getCount = methods.Single(x => x.Name == "get_Count");
-            clear = methods.Single(x => x.Name == "Clear");
-            nop = Instruction.Create(OpCodes.Nop);
+            var methods = systemModule.GetType("System.Collections.ObjectModel", "Collection`1").Methods;
+            getCount = mainModule.ImportReference(methods.Single(x => x.Name == "get_Count"));
+            clear = mainModule.ImportReference(methods.Single(x => x.Name == "Clear"));
         }
 
-        public void InitField(TypeDefinition classDefinition, TypeReference argument)
+        public void InitField(TypeDefinition targetClass, string fieldName, TypeReference argument)
         {
-            collection = moduleDefinition.GenericInstanceType(typeof(Collection<>), argument);
-            var field = new FieldDefinition("linq_collection", FieldAttributes.Private, collection);
-            classDefinition.Fields.Add(field);
-            genericArgument = argument;
+            var collectionInstance = Import("System.Collections.ObjectModel", "Collection`1").MakeGenericInstanceType(argument);
+            iEnumerable = Import("System.Collections.Generic", "IEnumerable`1").MakeGenericInstanceType(argument);
+
+            collection = new FieldDefinition(fieldName, FieldAttributes.Private, collectionInstance);
+            targetClass.Fields.Add(collection);
         }
 
         public void Define(MethodBody methodBody)
         {
             var boolean = methodBody.AddVariableDefinition(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
+            var nop = Instruction.Create(OpCodes.Nop);
 
             //if(collection.Count < 0)
             processor.Emit(OpCodes.Ldarg_0);
@@ -69,15 +72,24 @@ namespace LINQ2Method.Basics
 
         public void ReturnValue(MethodBody methodBody)
         {
-            var iEnumerable = moduleDefinition.GenericInstanceType(typeof(IEnumerable<>), genericArgument);
             var variable = methodBody.AddVariableDefinition(iEnumerable);
             var processor = methodBody.GetILProcessor();
             
             processor.Emit(OpCodes.Ldarg_0);
             processor.Emit(OpCodes.Ldfld, collection);
             processor.Append(InstructionHelper.StLoc(variable));
-            processor.Emit(OpCodes.Br_S);
-            processor.Append(InstructionHelper.LdLoc(variable));
+
+            var fa = InstructionHelper.LdLoc(variable);
+            processor.Emit(OpCodes.Br_S, fa);
+            processor.Append(fa);
+        }
+
+        private TypeReference Import(string nameSpace, string name)
+        {
+            var type = systemModule.GetType(nameSpace, name);
+            var result = mainModule.ImportReference(type);
+            
+            return result;
         }
     }
 }

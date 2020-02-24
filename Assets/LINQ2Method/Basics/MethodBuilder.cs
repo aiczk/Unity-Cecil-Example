@@ -14,13 +14,15 @@ namespace LINQ2Method.Basics
         private Queue<ILinqOperator> operators;
         private TypeReference argType;
         private MethodDefinition methodDefinition;
+        private CacheCollection cacheCollection;
         private Arg arg;
 
-        public MethodBuilder(TypeSystem typeSystem)
+        public MethodBuilder(ModuleDefinition mainModule, ModuleDefinition systemModule)
         {
             operators = new Queue<ILinqOperator>();
-            MainLoop = new For(typeSystem);
+            MainLoop = new For(systemModule.TypeSystem);
             arg = new Arg();
+            cacheCollection = new CacheCollection(systemModule, mainModule);
         }
 
         public void Create(TypeDefinition targetClass, string methodName, TypeReference paramsType, TypeReference returnType)
@@ -30,12 +32,16 @@ namespace LINQ2Method.Basics
             targetClass.Methods.Add(methodDefinition);
             arg.Define(methodDefinition.Body, paramsType);
             
+            //todo これはいけない。
+            cacheCollection.InitField(targetClass, $"linq_{methodName}", ((GenericInstanceType)returnType).GenericArguments[0]);
+            
             methodBody = methodDefinition.Body;
             argType = paramsType;
         }
         
         public void Begin()
         {
+            cacheCollection.Define(methodBody);
             MainLoop.Start(methodBody);
             MainLoop.DefineLocal(methodBody, argType);
         }
@@ -43,7 +49,7 @@ namespace LINQ2Method.Basics
         public void End()
         {
             MainLoop.End(methodBody);
-
+            cacheCollection.ReturnValue(methodBody);
             InstructionHelper.Return(methodBody);
         }
 

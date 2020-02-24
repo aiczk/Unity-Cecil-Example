@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Rocks;
 using UnityEditor;
+using UnityEngine;
 
 namespace LINQ2Method
 {
@@ -29,7 +31,8 @@ namespace LINQ2Method
                 var readerParams = AssemblyHelper.ReadAndWrite();
                 var mainModule = AssemblyHelper.FindModule("Main", readerParams);
                 var l2MModule = AssemblyHelper.FindModule("L2MAttributes", readerParams);
-                Execute(mainModule,l2MModule);
+                var systemModule = AssemblyHelper.GetCoreModule();
+                Execute(mainModule, l2MModule, systemModule);
             }
             finally
             {
@@ -39,14 +42,14 @@ namespace LINQ2Method
             //Debug.Log(stopWatch.Elapsed.ToString());
         }
 
-        private static void Execute(ModuleDefinition mainModule, ModuleDefinition l2MModule)
+        private static void Execute(ModuleDefinition mainModule, ModuleDefinition l2MModule, ModuleDefinition systemModule)
         {
             var l2MOptimizeAttribute = l2MModule.GetType("LINQ2Method.Attributes", "OptimizeAttribute");
             var typeSystem = mainModule.TypeSystem;
             
             var classAnalyzer = new ClassAnalyzer(mainModule, l2MOptimizeAttribute);
             var methodAnalyzer = new MethodAnalyzer(typeSystem);
-            var methodBuilder = new MethodBuilder(typeSystem);
+            var methodBuilder = new MethodBuilder(mainModule, systemModule);
             
             var analyzedClass = classAnalyzer.Analyze();
             foreach (var targetClass in analyzedClass.OptimizeTypes)
