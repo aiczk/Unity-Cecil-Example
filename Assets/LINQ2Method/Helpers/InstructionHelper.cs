@@ -2,6 +2,8 @@
 using LINQ2Method.Basics;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
+
 // ReSharper disable once ReturnTypeCanBeEnumerable.Global
 
 namespace LINQ2Method.Helpers
@@ -55,6 +57,9 @@ namespace LINQ2Method.Helpers
             methodBody.Variables.Add(variable);
             return variable;
         }
+
+        public static GenericInstanceType GenericInstanceType(this ModuleDefinition module, Type type, params TypeReference[] arguments) =>
+            module.ImportReference(type).MakeGenericInstanceType(arguments);
         
         public static Instruction[] ConvertFunction(MethodBody funcMethod, For forLoop)
         {

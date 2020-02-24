@@ -1,9 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
@@ -13,6 +15,7 @@ namespace LINQ2Method.Basics
         private ModuleDefinition moduleDefinition;
 
         private GenericInstanceType collection;
+        private TypeReference genericArgument;
         private MethodDefinition getCount;
         private MethodDefinition clear;
         private Instruction nop; 
@@ -21,18 +24,19 @@ namespace LINQ2Method.Basics
         {
             this.moduleDefinition = moduleDefinition;
             typeSystem = moduleDefinition.TypeSystem;
-        }
-
-        public void Init(TypeDefinition classDefinition, TypeReference param)
-        {
-            collection = moduleDefinition.ImportReference(typeof(Collection<>)).MakeGenericInstanceType(param);
-            var field = new FieldDefinition("linq_collection", FieldAttributes.Private, collection);
-            classDefinition.Fields.Add(field);
-
+            
             var methods = moduleDefinition.GetType("System.Collections.ObjectModel", "Collection`1").Methods;
             getCount = methods.Single(x => x.Name == "get_Count");
             clear = methods.Single(x => x.Name == "Clear");
             nop = Instruction.Create(OpCodes.Nop);
+        }
+
+        public void InitField(TypeDefinition classDefinition, TypeReference argument)
+        {
+            collection = moduleDefinition.GenericInstanceType(typeof(Collection<>), argument);
+            var field = new FieldDefinition("linq_collection", FieldAttributes.Private, collection);
+            classDefinition.Fields.Add(field);
+            genericArgument = argument;
         }
 
         public void Define(MethodBody methodBody)
@@ -61,6 +65,19 @@ namespace LINQ2Method.Basics
             
             processor.Emit(OpCodes.Nop);
             processor.Append(nop);
+        }
+
+        public void ReturnValue(MethodBody methodBody)
+        {
+            var iEnumerable = moduleDefinition.GenericInstanceType(typeof(IEnumerable<>), genericArgument);
+            var variable = methodBody.AddVariableDefinition(iEnumerable);
+            var processor = methodBody.GetILProcessor();
+            
+            processor.Emit(OpCodes.Ldarg_0);
+            processor.Emit(OpCodes.Ldfld, collection);
+            processor.Append(InstructionHelper.StLoc(variable));
+            processor.Emit(OpCodes.Br_S);
+            processor.Append(InstructionHelper.LdLoc(variable));
         }
     }
 }

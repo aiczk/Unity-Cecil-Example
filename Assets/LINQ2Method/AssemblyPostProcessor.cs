@@ -44,13 +44,11 @@ namespace LINQ2Method
             var l2MOptimizeAttribute = l2MModule.GetType("LINQ2Method.Attributes", "OptimizeAttribute");
             var typeSystem = mainModule.TypeSystem;
             
-            var methodBuilder = new MethodBuilder(typeSystem);
             var classAnalyzer = new ClassAnalyzer(mainModule, l2MOptimizeAttribute);
             var methodAnalyzer = new MethodAnalyzer(typeSystem);
+            var methodBuilder = new MethodBuilder(typeSystem);
             
             var analyzedClass = classAnalyzer.Analyze();
-
-            //var returnType mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(argType);
             foreach (var targetClass in analyzedClass.OptimizeTypes)
             {
                 foreach (var method in classAnalyzer.AnalyzeMethod(targetClass))
@@ -58,7 +56,7 @@ namespace LINQ2Method
                     var analyzedMethod = methodAnalyzer.Analyze(method);
                     var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(analyzedMethod.ReturnType);
                     var methodName = Guid.NewGuid().ToString("N");
-
+                    
                     methodBuilder.Create(targetClass, methodName, analyzedMethod.ParameterType, returnType);
                     methodBuilder.Begin();
                     

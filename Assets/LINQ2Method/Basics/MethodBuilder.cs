@@ -43,7 +43,7 @@ namespace LINQ2Method.Basics
         public void End()
         {
             MainLoop.End(methodBody);
-            //todo return value
+
             InstructionHelper.Return(methodBody);
         }
 
