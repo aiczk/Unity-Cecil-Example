@@ -15,7 +15,7 @@ namespace LINQ2Method.Basics
         private ModuleDefinition systemModule;
         private ModuleDefinition mainModule;
 
-        private FieldDefinition collection;
+        private FieldDefinition list;
         private GenericInstanceType iEnumerable;
         
         private MethodReference getCount;
@@ -27,29 +27,33 @@ namespace LINQ2Method.Basics
             this.mainModule = mainModule;
             typeSystem = systemModule.TypeSystem;
             
-            var methods = systemModule.GetType("System.Collections.ObjectModel", "Collection`1").Methods;
-            getCount = mainModule.ImportReference(methods.Single(x => x.Name == "get_Count"));
-            clear = mainModule.ImportReference(methods.Single(x => x.Name == "Clear"));
+            var methods = systemModule.GetType("System.Collections.Generic", "List`1").Methods;
+            getCount = methods.Single(x => x.Name == "get_Count");
+            clear = methods.Single(x => x.Name == "Clear");
         }
 
         public void InitField(TypeDefinition targetClass, string fieldName, TypeReference argument)
         {
-            var collectionInstance = Import("System.Collections.ObjectModel", "Collection`1").MakeGenericInstanceType(argument);
+            var listInstance = Import("System.Collections.Generic", "List`1").MakeGenericInstanceType(argument);
             iEnumerable = Import("System.Collections.Generic", "IEnumerable`1").MakeGenericInstanceType(argument);
 
-            collection = new FieldDefinition(fieldName, FieldAttributes.Private, collectionInstance);
-            targetClass.Fields.Add(collection);
+            getCount = mainModule.ImportReference(getCount.Resolve().MakeGeneric(argument));
+            clear = mainModule.ImportReference(clear.Resolve().MakeGeneric(argument));
+
+            list = new FieldDefinition(fieldName, FieldAttributes.Private, listInstance);
+            targetClass.Fields.Add(list);
         }
 
         public void Define(MethodBody methodBody)
         {
             var boolean = methodBody.AddVariableDefinition(typeSystem.Boolean);
             var processor = methodBody.GetILProcessor();
-            var nop = Instruction.Create(OpCodes.Nop);
-
+            var jumpLabel = Instruction.Create(OpCodes.Nop);
+            
+            processor.Emit(OpCodes.Nop);
             //if(collection.Count < 0)
             processor.Emit(OpCodes.Ldarg_0);
-            processor.Emit(OpCodes.Ldfld, collection);
+            processor.Emit(OpCodes.Ldfld, list);
             
             //get_count()
             processor.Emit(OpCodes.Callvirt, getCount);
@@ -57,17 +61,17 @@ namespace LINQ2Method.Basics
             processor.Emit(OpCodes.Clt);
             processor.Append(InstructionHelper.StLoc(boolean));
             processor.Append(InstructionHelper.LdLoc(boolean));
-            processor.Emit(OpCodes.Brfalse_S, nop);
+            processor.Emit(OpCodes.Brfalse_S, jumpLabel);
             
             //collection.Clear();
             processor.Emit(OpCodes.Ldarg_0);
-            processor.Emit(OpCodes.Ldfld, collection);
+            processor.Emit(OpCodes.Ldfld, list);
             
             //clear()
             processor.Emit(OpCodes.Callvirt, clear);
             
             processor.Emit(OpCodes.Nop);
-            processor.Append(nop);
+            processor.Append(jumpLabel);
         }
 
         public void ReturnValue(MethodBody methodBody)
@@ -76,7 +80,7 @@ namespace LINQ2Method.Basics
             var processor = methodBody.GetILProcessor();
             
             processor.Emit(OpCodes.Ldarg_0);
-            processor.Emit(OpCodes.Ldfld, collection);
+            processor.Emit(OpCodes.Ldfld, list);
             processor.Append(InstructionHelper.StLoc(variable));
 
             var fa = InstructionHelper.LdLoc(variable);

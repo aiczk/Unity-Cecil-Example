@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
@@ -23,7 +24,7 @@ public class Perform : MonoBehaviour
         stopWatch.Stop();
         Debug.Log(stopWatch.Elapsed.ToString());*/
 
-        FSA();
+        //FSA();
     }
     
     private void FSA()

@@ -8,7 +8,7 @@ namespace _Script
  {
      public class FuncTester
      {
-         private Collection<int> collection = new Collection<int>();
+         private List<int> collection = new List<int>();
          
          //[Optimize]
          private void Foo()
