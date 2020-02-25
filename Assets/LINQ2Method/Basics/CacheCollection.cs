@@ -1,23 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Linq;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
-using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
     public class CacheCollection
     {
+        public Instruction Add { get;}
+        
         private TypeSystem typeSystem;
         private ModuleDefinition systemModule;
         private ModuleDefinition mainModule;
 
         private FieldDefinition list;
         private GenericInstanceType iEnumerable;
-        
+
+        private MethodReference add;
         private MethodReference getCount;
         private MethodReference clear;
 
@@ -28,8 +28,11 @@ namespace LINQ2Method.Basics
             typeSystem = systemModule.TypeSystem;
             
             var methods = systemModule.GetType("System.Collections.Generic", "List`1").Methods;
+            add = methods.Single(x => x.Name == "Add");
             getCount = methods.Single(x => x.Name == "get_Count");
             clear = methods.Single(x => x.Name == "Clear");
+
+            Add = Instruction.Create(OpCodes.Ldarg_0);
         }
 
         public void InitField(TypeDefinition targetClass, string fieldName, TypeReference argument)
@@ -37,6 +40,7 @@ namespace LINQ2Method.Basics
             var listInstance = Import("System.Collections.Generic", "List`1").MakeGenericInstanceType(argument);
             iEnumerable = Import("System.Collections.Generic", "IEnumerable`1").MakeGenericInstanceType(argument);
 
+            add = mainModule.ImportReference(add.Resolve().MakeGeneric(argument));
             getCount = mainModule.ImportReference(getCount.Resolve().MakeGeneric(argument));
             clear = mainModule.ImportReference(clear.Resolve().MakeGeneric(argument));
 
@@ -50,7 +54,6 @@ namespace LINQ2Method.Basics
             var processor = methodBody.GetILProcessor();
             var jumpLabel = Instruction.Create(OpCodes.Nop);
             
-            processor.Emit(OpCodes.Nop);
             //if(collection.Count < 0)
             processor.Emit(OpCodes.Ldarg_0);
             processor.Emit(OpCodes.Ldfld, list);
@@ -72,6 +75,18 @@ namespace LINQ2Method.Basics
             
             processor.Emit(OpCodes.Nop);
             processor.Append(jumpLabel);
+        }
+
+        public void AddCollection(MethodBody methodBody, VariableDefinition local)
+        {
+            var processor = methodBody.GetILProcessor();
+            
+            processor.Append(Add);
+            processor.Emit(OpCodes.Ldfld, list);
+            processor.Append(InstructionHelper.LdLoc(local));
+            processor.Emit(OpCodes.Callvirt, add);
+            processor.Emit(OpCodes.Nop);
+            processor.Emit(OpCodes.Nop);
         }
 
         public void ReturnValue(MethodBody methodBody)

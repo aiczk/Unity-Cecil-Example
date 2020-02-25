@@ -25,7 +25,13 @@ public class Perform : MonoBehaviour
         Debug.Log(stopWatch.Elapsed.ToString());*/
 
         //FSA();
+        
+        var coll = new List<int>();
+        coll.Add(123);
+        Debug.Log(coll.Count < 0);
+        Debug.Log(coll.Count > 0);
     }
+    
     
     private void FSA()
     {

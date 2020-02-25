@@ -48,7 +48,13 @@ namespace _Script
          {
              var enumerable = new[] {2, 41};
 
-             var s = enumerable.Where(x => x % 2 == 0).Where(x => x > 10).Select(x => x * 2);
+             var s = enumerable
+                 .Where(x => x % 2 == 0)
+                 .Where(x => x > 10)
+                 .Select(x => x * 2)
+                 .Where(x => x < 2)
+                 .Where(x => x > 11)
+                 ;
          }
 
          private int IntValue() => 123;

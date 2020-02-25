@@ -48,6 +48,7 @@ namespace LINQ2Method.Basics
 
         public void End()
         {
+            cacheCollection.AddCollection(methodBody, MainLoop.LocalDefinition);
             MainLoop.End(methodBody);
             cacheCollection.ReturnValue(methodBody);
             InstructionHelper.Return(methodBody);
@@ -71,7 +72,7 @@ namespace LINQ2Method.Basics
                 if (linqOperator.Type == JumpType.Jump)
                 {
                     var nextOperator = operators.Count > 0 ? operators.Peek() : null;
-                    var nextProcess = nextOperator == null ? MainLoop.LoopEnd : nextOperator.Next();
+                    var nextProcess = nextOperator == null ? cacheCollection.Add : nextOperator.Next();
                     
                     linqOperator.Define(methodBody, nextProcess);
                     continue;
