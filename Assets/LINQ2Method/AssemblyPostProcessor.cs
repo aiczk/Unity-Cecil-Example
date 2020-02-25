@@ -15,7 +15,7 @@ namespace LINQ2Method
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            //PostCompile();
+            PostCompile();
         }
 
         private static void PostCompile()
@@ -67,8 +67,7 @@ namespace LINQ2Method
                     
                     methodBuilder.BuildOperator();
                     methodBuilder.End();
-                    
-                    Debug.Log(method.Name);
+                    methodBuilder.Replace(method);
                 }
             }
 

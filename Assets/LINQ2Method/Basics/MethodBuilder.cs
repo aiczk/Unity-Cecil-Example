@@ -87,6 +87,13 @@ namespace LINQ2Method.Basics
         public void Replace(MethodDefinition methodDefinition)
         {
             var replacer = new MethodReplacer(methodDefinition);
+            replacer.RemoveSection();
+//            var body = methodDefinition.Body;
+//
+//            var processor = body.GetILProcessor();
+//
+//            var instruction = Instruction.Create(OpCodes.Call, method);
+//            processor.InsertBefore(body.Instructions[0], instruction);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Mono.Cecil;
+﻿using System.Collections.Generic;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 
@@ -15,43 +16,74 @@ namespace LINQ2Method.Basics
 
         public void RemoveSection()
         {
-            var ldLocIndex = -1;
-            var stLocIndex = -1;
-            
             var methodBody = method.Body;
-
-            for (var i = 0; i < methodBody.Instructions.Count; i++)
+            var list = new List<Instruction>();
+            var flag = false;
+            foreach (var instruction in methodBody.Instructions)
             {
-                var instruction = methodBody.Instructions[i];
                 var opCode = instruction.OpCode;
 
-                if (opCode == OpCodes.Ldloc_0 || opCode == OpCodes.Ldloc_1 || 
-                    opCode == OpCodes.Ldloc_2 || opCode == OpCodes.Ldloc_3 ||
-                    opCode == OpCodes.Ldloc_S)
+                //field
+                if (opCode == OpCodes.Ldarg_0)
                 {
                     var next = instruction.Next;
 
-                    if (next.OpCode != OpCodes.Ldsfld)
-                        continue;
-
-                    ldLocIndex = i;
+                    if (next.OpCode == OpCodes.Ldfld)
+                    {
+                        flag = true;
+                    }
                 }
 
-                if (opCode == OpCodes.Call)
-                {
-                    var next = instruction.Next;
+                //new
+//                if (opCode == OpCodes.Ldloc_0 || opCode == OpCodes.Ldloc_1 || 
+//                    opCode == OpCodes.Ldloc_2 || opCode == OpCodes.Ldloc_3 ||
+//                    opCode == OpCodes.Ldloc_S)
+//                {
+//                    var next = instruction.Next;
+//
+//                    if (next.OpCode != OpCodes.Ldsfld)
+//                    {
+//                        flag = true;
+//                    }
+//                }
 
-                    if (next.OpCode != OpCodes.Stloc_0 && next.OpCode != OpCodes.Stloc_1 &&
-                        next.OpCode != OpCodes.Stloc_2 && next.OpCode != OpCodes.Stloc_3 &&
-                        next.OpCode != OpCodes.Stloc_S) 
-                        continue;
+                if (opCode == OpCodes.Stloc_0 || opCode == OpCodes.Stloc_1 ||
+                    opCode == OpCodes.Stloc_2 || opCode == OpCodes.Stloc_3 ||
+                    opCode == OpCodes.Stloc_S)
+                {
+                    var next = instruction.Previous;
+
+                    if (next.OpCode == OpCodes.Call)
+                    {
+                        flag = false;
+                        list.Add(instruction);
+                    }
                     
-                    stLocIndex = i;
                 }
+                
+                if(!flag)
+                    continue;
+                
+                list.Add(instruction);
             }
 
-            for (var i = ldLocIndex; i < stLocIndex; i++) 
-                methodBody.Instructions.RemoveAt(i);
+            foreach (var instruction in list)
+            {
+                methodBody.Instructions.Remove(instruction);
+            }
         }
+
+        public void Replace(MethodDefinition callMethod)
+        {
+            //stloc.Nを覚えておく。
+            //
+        }
+    }
+
+    public enum CallType
+    {
+        Field,
+        Argument,
+        Local
     }
 }

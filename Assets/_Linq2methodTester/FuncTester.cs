@@ -20,8 +20,7 @@ namespace _Script
          //[Optimize]
          private void Doo()
          {
-             var enumerable = new[] {new Hoge(2), new Hoge(41)};
-             var s = enumerable.Select(x => x.Index).Where(x => x % 2 == 0).Where(x => x > 1919810);
+             var s = Dodo(new Hoge[4]);
          }
          
          private IEnumerable<int> Dodo(Hoge[] arr)
@@ -43,11 +42,11 @@ namespace _Script
 
      public class Foo
      {
+         private int[] enumerable = {1, 3, 4,};
+         
          [Optimize]
          private void Boo()
          {
-             var enumerable = new[] {2, 41};
-
              var s = enumerable
                  .Where(x => x % 2 == 0)
                  .Where(x => x > 10)
