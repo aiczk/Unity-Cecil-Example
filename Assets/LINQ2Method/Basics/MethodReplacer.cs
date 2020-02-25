@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using UnityEngine;
@@ -7,21 +8,34 @@ namespace LINQ2Method.Basics
 {
     public class MethodReplacer
     {
-        private MethodDefinition method;
+        private MethodBody methodBody;
+
+        private Instruction nop;
+        private Instruction ldfld;
+        private Instruction stLoc;
         
-        public MethodReplacer(MethodDefinition method)
+        public MethodReplacer(MethodBody methodBody)
         {
-            this.method = method;
+            this.methodBody = methodBody;
         }
 
         public void RemoveSection()
         {
-            var methodBody = method.Body;
             var list = new List<Instruction>();
             var flag = false;
             foreach (var instruction in methodBody.Instructions)
             {
                 var opCode = instruction.OpCode;
+
+                if (opCode == OpCodes.Nop)
+                {
+                    var next = instruction.Next;
+
+                    if (next.OpCode == OpCodes.Ldarg_0)
+                    {
+                        nop = instruction;
+                    }
+                }
 
                 //field
                 if (opCode == OpCodes.Ldarg_0)
@@ -31,6 +45,7 @@ namespace LINQ2Method.Basics
                     if (next.OpCode == OpCodes.Ldfld)
                     {
                         flag = true;
+                        ldfld = next;
                     }
                 }
 
@@ -51,14 +66,14 @@ namespace LINQ2Method.Basics
                     opCode == OpCodes.Stloc_2 || opCode == OpCodes.Stloc_3 ||
                     opCode == OpCodes.Stloc_S)
                 {
-                    var next = instruction.Previous;
+                    var previous = instruction.Previous;
 
-                    if (next.OpCode == OpCodes.Call)
+                    if (previous.OpCode == OpCodes.Call)
                     {
                         flag = false;
+                        stLoc = instruction;
                         list.Add(instruction);
                     }
-                    
                 }
                 
                 if(!flag)
@@ -75,9 +90,15 @@ namespace LINQ2Method.Basics
 
         public void Replace(MethodDefinition callMethod)
         {
-            //stloc.Nを覚えておく。
-            //
+            var processor = methodBody.GetILProcessor();
+
+            processor.InsertBefore(nop, Instruction.Create(OpCodes.Ldarg_0));
+            processor.InsertBefore(nop, Instruction.Create(OpCodes.Ldarg_0));
+            processor.InsertBefore(nop, ldfld);
+            processor.InsertBefore(nop, Instruction.Create(OpCodes.Call, callMethod));
+            processor.InsertBefore(nop, stLoc);
         }
+        
     }
 
     public enum CallType

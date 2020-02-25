@@ -1,42 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using _Script;
 using LINQ2Method.Attributes;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace _Script
  {
-     public class FuncTester
+     public class FuncTester : MonoBehaviour
      {
-         private List<int> collection = new List<int>();
-         
-         //[Optimize]
-         private void Foo()
-         {
-             var enumerable = new[] {new Hoge(2), new Hoge(41)};
-             var s = enumerable.Where(x => x.Index % 2 == 0).Where(x => x.Index > 114514).Select(x => x.Index);
-         }
-         
-         //[Optimize]
-         private void Doo()
-         {
-             var s = Dodo(new Hoge[4]);
-         }
-         
-         private IEnumerable<int> Dodo(Hoge[] arr)
-         {
-             if (collection.Count < 0) 
-                 collection.Clear();
+         private Hoge[] enumerable = new Hoge[1000000];
 
-             foreach (var i in arr)
+         [Optimize]
+         private void Optimize()
+         {
+             var ff = enumerable.Select(x => x.Index).Where(x => x % 2 == 0).Select(x => x * 3);
+         }
+         
+         private void NonOptimize()
+         {
+             var ff = enumerable.Select(x => x.Index).Where(x => x % 2 == 0).Select(x => x * 3);
+         }
+         
+         private void Time()
+         {
+             var stopWatch = new Stopwatch();
+             stopWatch.Start();
+             for (var i = 0; i < 1000000; i++)
              {
-                 //do!
-                 var ia = i.Index;
-                 
-                 collection.Add(ia);
+                 Optimize();
              }
+             stopWatch.Stop();
+             Debug.Log($"OPTIMIZE: {stopWatch.ElapsedMilliseconds.ToString()}");
+             
+             stopWatch.Reset();
+             stopWatch.Start();
+             for (var i = 0; i < 1000000; i++)
+             {
+                 NonOptimize();
+             }
+             stopWatch.Stop();
+             Debug.Log($"NON OPTIMIZE: {stopWatch.ElapsedMilliseconds.ToString()}");
+         }
 
-             return collection;
+         private void Start()
+         {
+             Time();
          }
      }
 
@@ -44,7 +56,7 @@ namespace _Script
      {
          private int[] enumerable = {1, 3, 4,};
          
-         [Optimize]
+         //[Optimize]
          private void Boo()
          {
              var s = enumerable

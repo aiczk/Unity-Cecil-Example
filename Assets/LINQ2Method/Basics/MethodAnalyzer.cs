@@ -3,6 +3,7 @@ using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
+using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
@@ -37,7 +38,12 @@ namespace LINQ2Method.Basics
 
                 if (opCode == OpCodes.Call)
                 {
+                    //todo toString()とかいろいろ引っかかる
                     var operatorMethodToken = GetToken<GenericInstanceMethod>(instruction);
+                    
+                    if(operatorMethodToken == null)
+                        continue;
+                    
                     operatorType = (Operator) Enum.Parse(typeof(Operator), operatorMethodToken.Name);
                 }
 
@@ -53,7 +59,10 @@ namespace LINQ2Method.Basics
 
             return new AnalyzedMethod(operators.ToReadOnlyCollection());
 
-            T GetToken<T>(Instruction instruction) => (T) instruction.Operand;
+            T GetToken<T>(Instruction instruction) where T : class
+            {
+                return instruction.Operand as T;
+            }
         }
 
         public ILinqOperator OperatorFactory(LinqOperator linqOperator, MethodBuilder methodBuilder)

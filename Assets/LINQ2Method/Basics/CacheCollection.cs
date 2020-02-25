@@ -3,6 +3,7 @@ using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using UnityEngine;
 
 namespace LINQ2Method.Basics
 {
@@ -17,6 +18,7 @@ namespace LINQ2Method.Basics
         private FieldDefinition list;
         private GenericInstanceType iEnumerable;
 
+        private MethodReference ctor;
         private MethodReference add;
         private MethodReference getCount;
         private MethodReference clear;
@@ -28,11 +30,28 @@ namespace LINQ2Method.Basics
             typeSystem = systemModule.TypeSystem;
             
             var methods = systemModule.GetType("System.Collections.Generic", "List`1").Methods;
+            ctor = methods.Single(x => x.Name == ".ctor" && x.Parameters.Count == 0);
             add = methods.Single(x => x.Name == "Add");
             getCount = methods.Single(x => x.Name == "get_Count");
             clear = methods.Single(x => x.Name == "Clear");
 
             Add = Instruction.Create(OpCodes.Ldarg_0);
+        }
+
+        public void Constructor(TypeDefinition targetClass, TypeReference argument)
+        {
+            //todo .ctorがない場合
+            var classCtor = targetClass.Methods.Single(x => x.Name == ".ctor");
+            var methodBody = classCtor.Body;
+            
+            ctor = mainModule.ImportReference(ctor.Resolve().MakeGeneric(argument));
+
+            var first = methodBody.Instructions.First();
+            var processor = methodBody.GetILProcessor();
+            
+            processor.InsertBefore(first, Instruction.Create(OpCodes.Ldarg_0));
+            processor.InsertBefore(first, Instruction.Create(OpCodes.Newobj, ctor));
+            processor.InsertBefore(first, Instruction.Create(OpCodes.Stfld, list));
         }
 
         public void InitField(TypeDefinition targetClass, string fieldName, TypeReference argument)
@@ -61,7 +80,7 @@ namespace LINQ2Method.Basics
             //get_count()
             processor.Emit(OpCodes.Callvirt, getCount);
             processor.Emit(OpCodes.Ldc_I4_0);
-            processor.Emit(OpCodes.Clt);
+            processor.Emit(OpCodes.Cgt);
             processor.Append(InstructionHelper.StLoc(boolean));
             processor.Append(InstructionHelper.LdLoc(boolean));
             processor.Emit(OpCodes.Brfalse_S, jumpLabel);

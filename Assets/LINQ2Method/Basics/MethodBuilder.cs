@@ -30,15 +30,17 @@ namespace LINQ2Method.Basics
 
         public void Create(TypeDefinition targetClass, string methodName, TypeReference paramsType, TypeReference returnType)
         {
-            var iEnumerable = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(returnType);
-            method = new MethodDefinition(methodName, MethodAttributes.Private, iEnumerable);
+            var returnEnumerable = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(returnType);
+            method = new MethodDefinition(methodName, MethodAttributes.Private, returnEnumerable);
             targetClass.Methods.Add(method);
             
             arg.Define(method.Body, paramsType);
             cacheCollection.InitField(targetClass, $"linq_{methodName}", returnType);
+            cacheCollection.Constructor(targetClass, returnType);
             
             methodBody = method.Body;
             argType = paramsType;
+            
         }
         
         public void Begin()
@@ -84,16 +86,11 @@ namespace LINQ2Method.Basics
             }
         }
 
-        public void Replace(MethodDefinition methodDefinition)
+        public void Replace(MethodDefinition targetMethod)
         {
-            var replacer = new MethodReplacer(methodDefinition);
+            var replacer = new MethodReplacer(targetMethod.Body);
             replacer.RemoveSection();
-//            var body = methodDefinition.Body;
-//
-//            var processor = body.GetILProcessor();
-//
-//            var instruction = Instruction.Create(OpCodes.Call, method);
-//            processor.InsertBefore(body.Instructions[0], instruction);
+            replacer.Replace(method);
         }
     }
 }
