@@ -3,39 +3,41 @@ using System.Collections.Generic;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 
 namespace LINQ2Method.Basics
 {
     public class MethodBuilder
     {
-        public For MainLoop { get; }
-        
+        internal For MainLoop { get; }
+
+        private ModuleDefinition mainModule;
         private MethodBody methodBody;
+        private CacheCollection cacheCollection;
         private Queue<ILinqOperator> operators;
         private TypeReference argType;
-        private MethodDefinition methodDefinition;
-        private CacheCollection cacheCollection;
+        private MethodDefinition method;
         private Arg arg;
 
         public MethodBuilder(ModuleDefinition mainModule, ModuleDefinition systemModule)
         {
+            this.mainModule = mainModule;
+            cacheCollection = new CacheCollection(systemModule, mainModule);
             operators = new Queue<ILinqOperator>();
             MainLoop = new For(systemModule.TypeSystem);
             arg = new Arg();
-            cacheCollection = new CacheCollection(systemModule, mainModule);
         }
 
         public void Create(TypeDefinition targetClass, string methodName, TypeReference paramsType, TypeReference returnType)
         {
-            methodDefinition = new MethodDefinition(methodName, MethodAttributes.Private, returnType);
+            var iEnumerable = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(returnType);
+            method = new MethodDefinition(methodName, MethodAttributes.Private, iEnumerable);
+            targetClass.Methods.Add(method);
             
-            targetClass.Methods.Add(methodDefinition);
-            arg.Define(methodDefinition.Body, paramsType);
+            arg.Define(method.Body, paramsType);
+            cacheCollection.InitField(targetClass, $"linq_{methodName}", returnType);
             
-            //todo これはいけない。
-            cacheCollection.InitField(targetClass, $"linq_{methodName}", ((GenericInstanceType)returnType).GenericArguments[0]);
-            
-            methodBody = methodDefinition.Body;
+            methodBody = method.Body;
             argType = paramsType;
         }
         
@@ -48,7 +50,7 @@ namespace LINQ2Method.Basics
 
         public void End()
         {
-            cacheCollection.AddCollection(methodBody, MainLoop.LocalDefinition);
+            cacheCollection.AddValue(methodBody, MainLoop.LocalDefinition);
             MainLoop.End(methodBody);
             cacheCollection.ReturnValue(methodBody);
             InstructionHelper.Return(methodBody);

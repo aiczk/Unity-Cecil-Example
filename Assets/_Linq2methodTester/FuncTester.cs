@@ -56,7 +56,5 @@ namespace _Script
                  .Where(x => x > 11)
                  ;
          }
-
-         private int IntValue() => 123;
      }
  }

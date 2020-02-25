@@ -77,7 +77,7 @@ namespace LINQ2Method.Basics
             processor.Append(jumpLabel);
         }
 
-        public void AddCollection(MethodBody methodBody, VariableDefinition local)
+        public void AddValue(MethodBody methodBody, VariableDefinition local)
         {
             var processor = methodBody.GetILProcessor();
             

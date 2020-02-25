@@ -1,24 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
-using Mono.Cecil.Rocks;
 using UnityEditor;
-using UnityEngine;
 
 namespace LINQ2Method
 {
     [InitializeOnLoad]
-    public static class AssemblyPostProcessor
+    internal static class AssemblyPostProcessor
     {
         static AssemblyPostProcessor()
         { 
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             
-            PostCompile();
+            //PostCompile();
         }
 
         private static void PostCompile()
@@ -57,10 +53,9 @@ namespace LINQ2Method
                 foreach (var method in classAnalyzer.AnalyzeMethod(targetClass))
                 {
                     var analyzedMethod = methodAnalyzer.Analyze(method);
-                    var returnType = mainModule.ImportReference(typeof(IEnumerable<>)).MakeGenericInstanceType(analyzedMethod.ReturnType);
                     var methodName = Guid.NewGuid().ToString("N");
                     
-                    methodBuilder.Create(targetClass, methodName, analyzedMethod.ParameterType, returnType);
+                    methodBuilder.Create(targetClass, methodName, analyzedMethod.ParameterType, analyzedMethod.ReturnType);
                     methodBuilder.Begin();
                     
                     foreach (var linqOperator in analyzedMethod.Operators)
