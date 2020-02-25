@@ -3,6 +3,7 @@ using LINQ2Method.Basics;
 using LINQ2Method.Helpers;
 using Mono.Cecil;
 using UnityEditor;
+using UnityEngine;
 
 namespace LINQ2Method
 {
@@ -27,8 +28,8 @@ namespace LINQ2Method
                 var readerParams = AssemblyHelper.ReadAndWrite();
                 var mainModule = AssemblyHelper.FindModule("Main", readerParams);
                 var l2MModule = AssemblyHelper.FindModule("L2MAttributes", readerParams);
-                var systemModule = AssemblyHelper.GetCoreModule();
-                Execute(mainModule, l2MModule, systemModule);
+                var coreModule = AssemblyHelper.GetCoreModule();
+                Execute(mainModule, l2MModule, coreModule);
             }
             finally
             {
@@ -38,14 +39,14 @@ namespace LINQ2Method
             //Debug.Log(stopWatch.Elapsed.ToString());
         }
 
-        private static void Execute(ModuleDefinition mainModule, ModuleDefinition l2MModule, ModuleDefinition systemModule)
+        private static void Execute(ModuleDefinition mainModule, ModuleDefinition l2MModule, ModuleDefinition coreModule)
         {
             var l2MOptimizeAttribute = l2MModule.GetType("LINQ2Method.Attributes", "OptimizeAttribute");
             var typeSystem = mainModule.TypeSystem;
             
             var classAnalyzer = new ClassAnalyzer(mainModule, l2MOptimizeAttribute);
             var methodAnalyzer = new MethodAnalyzer(typeSystem);
-            var methodBuilder = new MethodBuilder(mainModule, systemModule);
+            var methodBuilder = new MethodBuilder(mainModule, coreModule);
             
             var analyzedClass = classAnalyzer.Analyze();
             foreach (var targetClass in analyzedClass.OptimizeTypes)
@@ -66,6 +67,8 @@ namespace LINQ2Method
                     
                     methodBuilder.BuildOperator();
                     methodBuilder.End();
+                    
+                    Debug.Log(method.Name);
                 }
             }
 

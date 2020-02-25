@@ -83,5 +83,10 @@ namespace LINQ2Method.Basics
                 linqOperator.Define(methodBody, null);
             }
         }
+
+        public void Replace(MethodDefinition methodDefinition)
+        {
+            var replacer = new MethodReplacer(methodDefinition);
+        }
     }
 }
