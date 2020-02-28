@@ -4,16 +4,16 @@ namespace _Script
 {
     public class Hoge : IEquatable<Hoge>
     {
-        public int Index;
+        public string Name;
 
-        public Hoge(int index)
+        public Hoge(string name)
         {
-            this.Index = index;
+            Name = name;
         }
 
         public bool Equals(Hoge other)
         {
-            return other != null && other.Index == Index;
+            return other != null && other.Name == Name;
         }
 
         public override bool Equals(object obj)
